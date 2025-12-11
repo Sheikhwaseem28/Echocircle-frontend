@@ -36,7 +36,7 @@ const PostWidget = ({
 
   const handleLike = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/posts/${postId}/like`, {
+      const response = await fetch(`https://echocircle-backend.vercel.app/posts/${postId}/like`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -69,7 +69,7 @@ const PostWidget = ({
       </Typography>
       {picturePath && (
         <img
-          src={`http://localhost:3001/assets/${picturePath}`}
+          src={`https://echocircle-backend.vercel.app/assets/${picturePath}`}
           alt="post"
           style={{ borderRadius: "0.75rem", marginTop: "0.75rem", width: "100%", height: "auto" }}
         />

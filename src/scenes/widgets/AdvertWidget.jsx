@@ -16,7 +16,7 @@ const AdvertWidget = () => {
       </FlexBetween>
       
       <img
-        src="http://localhost:3001/assets/info4.jpg"
+        src="https://echocircle-backend.vercel.app/assets/info4.jpg"
         alt="advert"
         width="100%"
         height="auto"

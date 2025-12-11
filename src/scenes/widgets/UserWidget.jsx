@@ -25,7 +25,7 @@ const UserWidget = ({ userId, picturePath }) => {
     if (!userId) return;
     const fetchUser = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/users/${userId}`, {
+        const response = await fetch(`https://echocircle-backend.vercel.app/users/${userId}`, {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         });

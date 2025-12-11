@@ -11,8 +11,8 @@ const PostsWidget = ({ userId, isProfile = false }) => {
   useEffect(() => {
     const fetchPosts = async () => {
       const url = isProfile 
-        ? `http://localhost:3001/posts/${userId}/posts`
-        : "http://localhost:3001/posts";
+        ? `https://echocircle-backend.vercel.app/posts/${userId}/posts`
+        : "https://echocircle-backend.vercel.app/posts";
 
       const response = await fetch(url, {
         method: "GET",

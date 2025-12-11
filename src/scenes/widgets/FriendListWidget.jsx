@@ -14,7 +14,7 @@ const FriendListWidget = ({ userId }) => {
   useEffect(() => {
     const fetchFriends = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/users/${userId}/friends`, {
+        const response = await fetch(`https://echocircle-backend.vercel.app/users/${userId}/friends`, {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         });
