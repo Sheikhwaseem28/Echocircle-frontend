@@ -55,37 +55,46 @@ const Form = () => {
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
 
-  const register = async (values, onSubmitProps) => {
-    const formData = new FormData();
-    for (let value in values) {
-      if (value === 'picture') {
-        formData.append('picture', values[value]); // Append the actual file object
-      } else {
-        formData.append(value, values[value]);
-      }
+const register = async (values, onSubmitProps) => {
+  const formData = new FormData();
+  
+  // Append all text fields
+  Object.keys(values).forEach(key => {
+    if (key !== 'picture') {
+      formData.append(key, values[key]);
     }
+  });
   
-    try {
-      const savedUserResponse = await fetch("https://echocircle-backend.vercel.app/auth/register", {
-        method: "POST",
-        body: formData,
-      });
-  
-      if (!savedUserResponse.ok) {
-        const errorText = await savedUserResponse.text();
-        throw new Error(`HTTP error! Status: ${savedUserResponse.status}, Message: ${errorText}`);
-      }
-  
-      const savedUser = await savedUserResponse.json();
-      onSubmitProps.resetForm();
-  
-      if (savedUser) {
-        setPageType("login");
-      }
-    } catch (error) {
-      console.error("Error during fetch:", error);
+  // Append picture file
+  if (values.picture) {
+    formData.append('picture', values.picture);
+  }
+
+  try {
+    const savedUserResponse = await fetch("https://echocircle-backend.vercel.app/auth/register", {
+      method: "POST",
+      body: formData,
+      // Don't set Content-Type header for FormData - browser will set it automatically with boundary
+    });
+
+    if (!savedUserResponse.ok) {
+      const errorText = await savedUserResponse.text();
+      console.error("Server error response:", errorText);
+      throw new Error(`Registration failed: ${savedUserResponse.status}`);
     }
-  };
+
+    const savedUser = await savedUserResponse.json();
+    onSubmitProps.resetForm();
+
+    if (savedUser) {
+      setPageType("login");
+    }
+  } catch (error) {
+    console.error("Registration error:", error);
+    // You might want to show this error to the user
+    alert(`Registration failed: ${error.message}`);
+  }
+};
   
 
   const login = async (values, onSubmitProps) => {
