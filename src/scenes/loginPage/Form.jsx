@@ -8,6 +8,7 @@ import {
   useTheme,
   Alert,
   Snackbar,
+  CircularProgress,
 } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { Formik } from "formik";
@@ -27,7 +28,9 @@ const registerSchema = yup.object().shape({
     .required("Password is required"),
   location: yup.string().required("Location is required"),
   occupation: yup.string().required("Occupation is required"),
-  picture: yup.mixed().required("Profile picture is required"),
+  picture: yup.mixed().test("fileRequired", "Profile picture is required", (value) => {
+    return value !== null && value !== undefined;
+  }),
 });
 
 const loginSchema = yup.object().shape({
@@ -67,26 +70,42 @@ const Form = () => {
 
   const register = async (values, onSubmitProps) => {
     setIsLoading(true);
-    const formData = new FormData();
+    console.log("Register values:", values);
     
-    // Append all form fields
-    for (const key in values) {
-      if (values[key] !== null && values[key] !== undefined) {
-        formData.append(key, values[key]);
-      }
-    }
-
     try {
+      // Create FormData properly
+      const formData = new FormData();
+      
+      // Append text fields
+      formData.append("firstName", values.firstName);
+      formData.append("lastName", values.lastName);
+      formData.append("email", values.email);
+      formData.append("password", values.password);
+      formData.append("location", values.location);
+      formData.append("occupation", values.occupation);
+      
+      // Append file
+      if (values.picture) {
+        formData.append("picture", values.picture);
+      }
+      
+      // Log FormData contents for debugging
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+
       const response = await fetch("https://echocircle-backend.vercel.app/auth/register", {
         method: "POST",
         body: formData,
-        // Let browser set the content-type with boundary
+        // Don't set Content-Type header - let browser set it with boundary
       });
 
+      console.log("Response status:", response.status);
       const result = await response.json();
+      console.log("Response data:", result);
       
       if (!response.ok) {
-        throw new Error(result.message || `Registration failed: ${response.status}`);
+        throw new Error(result.message || `Registration failed with status: ${response.status}`);
       }
 
       if (result.success) {
@@ -107,19 +126,25 @@ const Form = () => {
   const login = async (values, onSubmitProps) => {
     setIsLoading(true);
     try {
+      console.log("Login attempt for:", values.email);
+      
       const response = await fetch("https://echocircle-backend.vercel.app/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(values),
       });
 
+      console.log("Login response status:", response.status);
       const result = await response.json();
+      console.log("Login response data:", result);
       
       if (!response.ok) {
         throw new Error(result.message || `Login failed: ${response.status}`);
       }
 
-      if (result.token) {
+      if (result.token && result.user) {
         dispatch(
           setLogin({
             user: result.user,
@@ -127,13 +152,15 @@ const Form = () => {
           })
         );
         showAlert("Login successful!", "success");
-        navigate("/home");
+        setTimeout(() => {
+          navigate("/home");
+        }, 1000);
       } else {
         throw new Error("Invalid response from server");
       }
     } catch (error) {
       console.error("Login error:", error);
-      showAlert(error.message || "Login failed. Please try again.");
+      showAlert(error.message || "Login failed. Please check your credentials.");
     } finally {
       setIsLoading(false);
       onSubmitProps.resetForm();
@@ -141,6 +168,7 @@ const Form = () => {
   };
 
   const handleFormSubmit = async (values, onSubmitProps) => {
+    console.log("Form submitted, pageType:", pageType);
     if (isLogin) {
       await login(values, onSubmitProps);
     } else if (isRegister) {
@@ -238,6 +266,8 @@ const Form = () => {
                     sx={{ gridColumn: "span 4" }}
                     disabled={isLoading}
                   />
+                  
+                  {/* Picture Upload Section */}
                   <Box
                     gridColumn="span 4"
                     border={`1px solid ${
@@ -248,13 +278,20 @@ const Form = () => {
                     borderRadius="5px"
                     p="1rem"
                   >
+                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                      Profile Picture *
+                    </Typography>
                     <Dropzone
                       accept={{
-                        'image/*': ['.jpeg', '.jpg', '.png']
+                        'image/jpeg': ['.jpeg', '.jpg'],
+                        'image/png': ['.png']
                       }}
                       maxFiles={1}
+                      maxSize={5242880} // 5MB
                       onDrop={(acceptedFiles) => {
-                        setFieldValue("picture", acceptedFiles[0]);
+                        if (acceptedFiles.length > 0) {
+                          setFieldValue("picture", acceptedFiles[0]);
+                        }
                       }}
                       disabled={isLoading}
                     >
@@ -266,7 +303,7 @@ const Form = () => {
                               ? palette.error.main 
                               : palette.primary.main
                           }`}
-                          p="2rem"
+                          p="1.5rem"
                           sx={{ 
                             "&:hover": { 
                               cursor: isLoading ? "not-allowed" : "pointer",
@@ -277,14 +314,25 @@ const Form = () => {
                         >
                           <input {...getInputProps()} />
                           {!values.picture ? (
-                            <Typography textAlign="center">
-                              {isDragActive 
-                                ? "Drop the image here..." 
-                                : "Drag & drop a profile picture, or click to select"}
-                            </Typography>
+                            <Box textAlign="center">
+                              <EditOutlinedIcon sx={{ color: palette.neutral.medium, mb: 1 }} />
+                              <Typography>
+                                {isDragActive 
+                                  ? "Drop the image here..." 
+                                  : "Drag & drop a profile picture, or click to select"}
+                              </Typography>
+                              <Typography variant="caption" color="textSecondary">
+                                Only *.jpeg, *.jpg, *.png images up to 5MB
+                              </Typography>
+                            </Box>
                           ) : (
                             <FlexBetween>
-                              <Typography>{values.picture.name}</Typography>
+                              <Box>
+                                <Typography fontWeight="500">{values.picture.name}</Typography>
+                                <Typography variant="caption" color="textSecondary">
+                                  {(values.picture.size / 1024 / 1024).toFixed(2)} MB
+                                </Typography>
+                              </Box>
                               <EditOutlinedIcon />
                             </FlexBetween>
                           )}
@@ -327,28 +375,29 @@ const Form = () => {
             </Box>
 
             {/* BUTTONS */}
-            <Box>
+            <Box mt="2rem">
               <Button
                 fullWidth
                 type="submit"
-                disabled={isLoading || !isValid}
+                disabled={isLoading || (!isValid && isRegister)}
+                variant="contained"
                 sx={{
-                  m: "2rem 0",
                   p: "1rem",
                   backgroundColor: palette.primary.main,
-                  color: palette.background.alt,
+                  color: "white",
                   "&:hover": { 
                     backgroundColor: palette.primary.dark,
-                    color: palette.background.alt,
                   },
                   "&:disabled": {
                     backgroundColor: palette.neutral.medium,
-                    color: palette.neutral.dark,
                   }
                 }}
               >
-                {isLoading ? "PROCESSING..." : isLogin ? "LOGIN" : "REGISTER"}
+                {isLoading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : isLogin ? "LOGIN" : "REGISTER"}
               </Button>
+              
               <Typography
                 onClick={() => {
                   if (!isLoading) {
@@ -359,6 +408,8 @@ const Form = () => {
                 sx={{
                   textDecoration: "underline",
                   color: palette.primary.main,
+                  textAlign: "center",
+                  mt: 2,
                   "&:hover": {
                     cursor: isLoading ? "not-allowed" : "pointer",
                     color: palette.primary.light,
