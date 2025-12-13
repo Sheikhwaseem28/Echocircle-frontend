@@ -19,10 +19,10 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import FlexBetween from "components/FlexBetween";
+import FlexBetween from "../../components/FlexBetween";
 import Dropzone from "react-dropzone";
-import UserImage from "components/UserImage";
-import WidgetWrapper from "components/WidgetWrapper";
+import UserImage from "../../components/UserImage";
+import WidgetWrapper from "../../components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
