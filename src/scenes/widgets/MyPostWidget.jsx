@@ -25,7 +25,7 @@ import UserImage from "../../components/UserImage";
 import WidgetWrapper from "../../components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "state";
+import { setPosts } from "../../state/index";
 
 const MyPostWidget = ({ picturePath }) => {
   const dispatch = useDispatch();
@@ -43,6 +43,9 @@ const MyPostWidget = ({ picturePath }) => {
   const { _id, firstName, lastName } = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+
+  const posts = useSelector((state) => state.posts);
+
 
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
@@ -104,7 +107,6 @@ const MyPostWidget = ({ picturePath }) => {
         };
 
         // Get current posts and add new one at the beginning
-        const posts = useSelector((state) => state.posts);
         const currentPosts = posts || [];
         const updatedPosts = [mockPost, ...currentPosts];
         dispatch(setPosts({ posts: updatedPosts }));

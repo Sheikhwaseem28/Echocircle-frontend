@@ -2,7 +2,7 @@ import { PersonAddOutlined, PersonRemoveOutlined } from "@mui/icons-material";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setFriends } from "state";
+import { setFriends } from "../state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 
@@ -18,7 +18,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const primaryDark = palette.primary.dark;
   const main = palette.neutral.main;
   const medium = palette.neutral.medium;
-  
+
 
   // Check if friends is an array before using .some
   const isFriend = Array.isArray(friends) && friends.some((friend) => friend._id === friendId);

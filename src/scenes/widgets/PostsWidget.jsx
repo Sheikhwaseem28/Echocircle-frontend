@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "state";
+import { setPosts } from "../../state/index";
 import PostWidget from "./PostWidget";
 
 const PostsWidget = ({ userId, isProfile = false }) => {
