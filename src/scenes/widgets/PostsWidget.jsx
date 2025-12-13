@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "state";
 import PostWidget from "./PostWidget";

@@ -104,7 +104,8 @@ const MyPostWidget = ({ picturePath }) => {
         };
 
         // Get current posts and add new one at the beginning
-        const currentPosts = useSelector((state) => state.posts) || [];
+        const posts = useSelector((state) => state.posts);
+        const currentPosts = posts || [];
         const updatedPosts = [mockPost, ...currentPosts];
         dispatch(setPosts({ posts: updatedPosts }));
         newPost = mockPost;
