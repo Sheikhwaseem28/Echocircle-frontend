@@ -18,6 +18,7 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const primaryDark = palette.primary.dark;
   const main = palette.neutral.main;
   const medium = palette.neutral.medium;
+  
 
   // Check if friends is an array before using .some
   const isFriend = Array.isArray(friends) && friends.some((friend) => friend._id === friendId);
