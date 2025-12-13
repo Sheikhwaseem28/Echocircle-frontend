@@ -45,12 +45,12 @@ const PostWidget = ({
         body: JSON.stringify({ userId: loggedInUserId }),
       });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+      if (response.ok) {
+        const updatedPost = await response.json();
+        dispatch(setPost({ post: updatedPost }));
+      } else {
+        console.error("Failed to like post");
       }
-
-      const updatedPost = await response.json();
-      dispatch(setPost({ post: updatedPost }));
     } catch (error) {
       console.error("Error liking post:", error);
     }
@@ -68,11 +68,39 @@ const PostWidget = ({
         {description}
       </Typography>
       {picturePath && (
-        <img
-          src={`https://echocircle-backend.vercel.app/assets/${picturePath}`}
-          alt="post"
-          style={{ borderRadius: "0.75rem", marginTop: "0.75rem", width: "100%", height: "auto" }}
-        />
+        <Box
+          sx={{
+            borderRadius: "0.75rem",
+            marginTop: "0.75rem",
+            width: "100%",
+            height: "300px",
+            backgroundColor: palette.neutral.light,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden"
+          }}
+        >
+          {/* Simple image display or placeholder */}
+          {picturePath.startsWith('http') || picturePath.startsWith('data:image') ? (
+            <img
+              src={picturePath}
+              alt="post"
+              style={{ 
+                width: "100%", 
+                height: "100%", 
+                objectFit: "cover" 
+              }}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.style.display = 'none';
+                e.target.parentElement.innerHTML = '<Typography color="textSecondary">Image not available</Typography>';
+              }}
+            />
+          ) : (
+            <Typography color="textSecondary">Image preview</Typography>
+          )}
+        </Box>
       )}
       <FlexBetween mt="0.25rem">
         <FlexBetween gap="1rem">
