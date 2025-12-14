@@ -4,105 +4,54 @@ import {
   LocationOnOutlined,
   WorkOutlineOutlined,
 } from "@mui/icons-material";
-import { 
-  Box, 
-  Typography, 
-  Divider, 
-  useTheme, 
-  IconButton,
-  CircularProgress,
-  Avatar,
-  Button,
-} from "@mui/material";
 import UserImage from "../../components/UserImage";
-import FlexBetween from "../../components/FlexBetween";
-import WidgetWrapper from "../../components/WidgetWrapper";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  User,
-  MapPin,
-  Briefcase,
-  Eye,
-  TrendingUp,
-  Users,
-  Link,
-  Mail,
-  Calendar,
-  Award,
-  Star,
-  CheckCircle,
-  Edit,
-  MoreVertical,
-  Share2,
-  Bell,
-  MessageSquare,
-  Globe,
-  Linkedin,
-  Twitter,
-  Instagram,
-  GitHub,
-} from "lucide-react";
 
 const UserWidget = ({ userId, picturePath }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    posts: 24,
-    connections: 156,
-    recommendations: 12,
-    achievements: 5,
-  });
-  
-  const { palette } = useTheme();
   const navigate = useNavigate();
   const token = useSelector((state) => state.token);
   const currentUser = useSelector((state) => state.user);
-  
-  const isOwnProfile = currentUser?._id === userId;
-  const dark = palette.neutral.dark;
-  const medium = palette.neutral.medium;
-  const main = palette.neutral.main;
-  const primaryColor = palette.primary.main;
 
   const mockUser = {
     _id: userId,
-    firstName: currentUser?.firstName || "John",
-    lastName: currentUser?.lastName || "Doe",
-    location: "San Francisco, California",
-    occupation: "Senior Software Engineer",
-    company: "TechCorp Inc.",
-    viewedProfile: 428,
-    impressions: 1284,
-    friends: ["friend1", "friend2", "friend3", "friend4", "friend5"],
-    joinedDate: "March 2023",
-    email: currentUser?.email || "john.doe@example.com",
-    bio: "Passionate about building amazing products and connecting with like-minded professionals.",
-    skills: ["React", "Node.js", "TypeScript", "UI/UX", "AWS"],
+    firstName: "John",
+    lastName: "Doe",
+    location: "New York, USA",
+    occupation: "Software Developer",
+    viewedProfile: 42,
+    impressions: 128,
+    friends: ["friend1", "friend2", "friend3"],
   };
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         setLoading(true);
-        
-        const response = await fetch(`https://echocircle-backend.vercel.app/users/${userId}`, {
-          method: "GET",
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
-        });
+
+        const response = await fetch(
+          `https://echocircle-backend.vercel.app/users/${userId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (response.ok) {
           const data = await response.json();
           setUser(data);
         } else {
+          console.log("Using mock user data");
           setUser(mockUser);
         }
       } catch (error) {
-        console.error('Fetching user failed:', error);
+        console.error("Fetching user failed:", error);
         setUser(mockUser);
       } finally {
         setLoading(false);
@@ -116,374 +65,116 @@ const UserWidget = ({ userId, picturePath }) => {
 
   if (loading) {
     return (
-      <WidgetWrapper>
-        <div className="flex flex-col items-center justify-center py-12">
-          <CircularProgress size={48} className="mb-4" />
-          <Typography color="textSecondary">
-            Loading profile...
-          </Typography>
-        </div>
-      </WidgetWrapper>
+      <div className="rounded-2xl border border-red-900/70 bg-neutral-950/90 p-4 text-xs text-neutral-300">
+        Loading user...
+      </div>
     );
   }
 
   if (!user) {
     return (
-      <WidgetWrapper>
-        <div className="text-center py-12">
-          <User size={48} className="text-gray-400 mx-auto mb-4" />
-          <Typography variant="h6" className="mb-2">
-            User not found
-          </Typography>
-          <Typography color="textSecondary">
-            This user profile is unavailable
-          </Typography>
-        </div>
-      </WidgetWrapper>
+      <div className="rounded-2xl border border-red-900/70 bg-neutral-950/90 p-4 text-xs text-neutral-300">
+        User not found
+      </div>
     );
   }
 
   const {
-    firstName = 'User',
-    lastName = '',
-    location = 'Location not specified',
-    occupation = 'Occupation not specified',
-    company,
+    firstName = "User",
+    lastName = "",
+    location = "Unknown Location",
+    occupation = "Unknown Occupation",
     viewedProfile = 0,
     impressions = 0,
     friends = [],
-    joinedDate,
-    email,
-    bio,
-    skills = [],
   } = user;
 
-  const fullName = `${firstName} ${lastName}`;
   const friendCount = Array.isArray(friends) ? friends.length : 0;
 
   return (
-    <WidgetWrapper className="relative group">
-      {/* Profile Header */}
-      <div className="flex flex-col items-center text-center pb-6 border-b border-gray-100">
-        {/* Cover Photo Area */}
-        <div className="relative w-full h-24 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-2xl -mx-6 -mt-6 mb-16">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-t-2xl"></div>
-        </div>
-        
-        {/* Profile Picture */}
-        <div className="absolute top-12 left-1/2 transform -translate-x-1/2">
-          <UserImage 
-            image={picturePath || currentUser?.picturePath} 
-            size="100px"
-            border
-            borderColor="white"
-            borderSize="4px"
-            elevate
-            showStatus
-            isOnline={true}
-          />
-        </div>
-        
-        {/* Name and Badge */}
-        <div className="mt-12">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Typography variant="h5" fontWeight="600" color={dark}>
-              {fullName}
-            </Typography>
-            {isOwnProfile && (
-              <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-600 rounded-full">
-                You
-              </span>
-            )}
-            <CheckCircle size={16} className="text-blue-500" />
+    <aside className="rounded-2xl border border-red-900/70 bg-neutral-950/95 p-4 text-neutral-100 shadow-[0_0_28px_rgba(127,29,29,0.45)]">
+      {/* ROW 1: header */}
+      <button
+        type="button"
+        onClick={() => navigate(`/profile/${userId}`)}
+        className="flex w-full items-center justify-between gap-2 pb-3"
+      >
+        <div className="flex items-center gap-3">
+          <UserImage image={picturePath || currentUser?.picturePath} />
+          <div className="text-left">
+            <p className="text-sm font-semibold text-neutral-50 hover:text-red-400">
+              {firstName} {lastName}
+            </p>
+            <p className="text-[11px] text-neutral-400">
+              {friendCount} friends
+            </p>
           </div>
-          
-          {/* Occupation */}
-          <Typography color={primaryColor} fontWeight="500" className="mb-1">
-            {occupation}
-            {company && ` • ${company}`}
-          </Typography>
-          
-          {/* Location */}
-          <Typography color={medium} className="flex items-center justify-center gap-1 mb-3">
-            <MapPin size={14} />
-            {location}
-          </Typography>
-          
-          {/* Stats */}
-          <div className="flex justify-center gap-6">
-            <div className="text-center">
-              <Typography variant="h6" fontWeight="600">
-                {friendCount}
-              </Typography>
-              <Typography variant="caption" color={medium}>
-                Connections
-              </Typography>
-            </div>
-            <div className="text-center">
-              <Typography variant="h6" fontWeight="600">
-                {stats.posts}
-              </Typography>
-              <Typography variant="caption" color={medium}>
-                Posts
-              </Typography>
-            </div>
-            <div className="text-center">
-              <Typography variant="h6" fontWeight="600">
-                {viewedProfile}
-              </Typography>
-              <Typography variant="caption" color={medium}>
-                Profile Views
-              </Typography>
-            </div>
-          </div>
+        </div>
+        <ManageAccountsOutlined sx={{ fontSize: 20 }} className="text-neutral-400" />
+      </button>
+
+      <div className="my-3 h-px w-full bg-neutral-800/80" />
+
+      {/* ROW 2: location + occupation */}
+      <div className="space-y-2 py-2 text-xs">
+        <div className="flex items-center gap-2">
+          <LocationOnOutlined sx={{ fontSize: 18 }} className="text-red-400" />
+          <p className="text-neutral-300">{location}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <WorkOutlineOutlined sx={{ fontSize: 18 }} className="text-red-400" />
+          <p className="text-neutral-300">{occupation}</p>
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex gap-2 my-6">
-        {isOwnProfile ? (
-          <>
-            <Button
-              fullWidth
-              variant="contained"
-              startIcon={<Edit size={18} />}
-              onClick={() => navigate(`/profile/edit/${userId}`)}
-              sx={{
-                backgroundColor: primaryColor,
-                borderRadius: '12px',
-                textTransform: 'none',
-                fontWeight: '500',
-              }}
-            >
-              Edit Profile
-            </Button>
-            <IconButton className="bg-gray-100 hover:bg-gray-200">
-              <MoreVertical size={20} />
-            </IconButton>
-          </>
-        ) : (
-          <>
-            <Button
-              fullWidth
-              variant="contained"
-              startIcon={<MessageSquare size={18} />}
-              sx={{
-                backgroundColor: primaryColor,
-                borderRadius: '12px',
-                textTransform: 'none',
-                fontWeight: '500',
-              }}
-            >
-              Message
-            </Button>
-            <Button
-              fullWidth
-              variant="outlined"
-              startIcon={<Users size={18} />}
-              sx={{
-                borderColor: palette.divider,
-                borderRadius: '12px',
-                textTransform: 'none',
-                fontWeight: '500',
-              }}
-            >
-              Connect
-            </Button>
-            <IconButton className="bg-gray-100 hover:bg-gray-200">
-              <MoreVertical size={20} />
-            </IconButton>
-          </>
-        )}
-      </div>
+      <div className="my-3 h-px w-full bg-neutral-800/80" />
 
-      {/* About Section */}
-      {bio && (
-        <div className="mb-6">
-          <Typography variant="subtitle1" fontWeight="600" className="mb-3 flex items-center gap-2">
-            <User size={18} />
-            About
-          </Typography>
-          <Typography color={medium} className="leading-relaxed">
-            {bio}
-          </Typography>
+      {/* ROW 3: stats */}
+      <div className="space-y-1 py-2 text-xs">
+        <div className="flex items-center justify-between">
+          <p className="text-neutral-400">Who&apos;s viewed your profile</p>
+          <p className="font-semibold text-neutral-50">{viewedProfile}</p>
         </div>
-      )}
-
-      {/* Details Grid */}
-      <div className="mb-6">
-        <Typography variant="subtitle1" fontWeight="600" className="mb-3 flex items-center gap-2">
-          <Briefcase size={18} />
-          Details
-        </Typography>
-        
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-50 rounded-lg">
-              <Briefcase size={16} className="text-blue-600" />
-            </div>
-            <div>
-              <Typography variant="caption" color={medium}>
-                Occupation
-              </Typography>
-              <Typography fontWeight="500">{occupation}</Typography>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-50 rounded-lg">
-              <MapPin size={16} className="text-emerald-600" />
-            </div>
-            <div>
-              <Typography variant="caption" color={medium}>
-                Location
-              </Typography>
-              <Typography fontWeight="500">{location}</Typography>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-50 rounded-lg">
-              <Calendar size={16} className="text-purple-600" />
-            </div>
-            <div>
-              <Typography variant="caption" color={medium}>
-                Joined
-              </Typography>
-              <Typography fontWeight="500">{joinedDate || "March 2023"}</Typography>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-50 rounded-lg">
-              <Mail size={16} className="text-amber-600" />
-            </div>
-            <div>
-              <Typography variant="caption" color={medium}>
-                Email
-              </Typography>
-              <Typography fontWeight="500">{email || "Not provided"}</Typography>
-            </div>
-          </div>
+        <div className="flex items-center justify-between">
+          <p className="text-neutral-400">Impressions of your posts</p>
+          <p className="font-semibold text-neutral-50">{impressions}</p>
         </div>
       </div>
 
-      {/* Skills */}
-      {skills.length > 0 && (
-        <div className="mb-6">
-          <Typography variant="subtitle1" fontWeight="600" className="mb-3 flex items-center gap-2">
-            <Award size={18} />
-            Skills & Expertise
-          </Typography>
-          <div className="flex flex-wrap gap-2">
-            {skills.map((skill, index) => (
-              <span
-                key={index}
-                className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+      <div className="my-3 h-px w-full bg-neutral-800/80" />
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Eye size={16} className="text-blue-600" />
-            <Typography variant="caption" color={medium}>
-              Profile Views
-            </Typography>
+      {/* ROW 4: social profiles */}
+      <div className="space-y-3 py-2">
+        <p className="text-xs font-semibold text-neutral-200">Social Profiles</p>
+
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <div className="h-6 w-6 rounded-full bg-red-600" />
+            <div className="text-[11px]">
+              <p className="font-semibold text-neutral-100">Twitter</p>
+              <p className="text-neutral-500">Social Network</p>
+            </div>
           </div>
-          <Typography variant="h5" fontWeight="600">
-            {viewedProfile.toLocaleString()}
-          </Typography>
+          <EditOutlined sx={{ fontSize: 16 }} className="text-neutral-400" />
         </div>
-        
-        <div className="bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp size={16} className="text-emerald-600" />
-            <Typography variant="caption" color={medium}>
-              Post Impressions
-            </Typography>
+
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <div className="h-6 w-6 rounded-full bg-red-600" />
+            <div className="text-[11px]">
+              <p className="font-semibold text-neutral-100">LinkedIn</p>
+              <p className="text-neutral-500">Network Platform</p>
+            </div>
           </div>
-          <Typography variant="h5" fontWeight="600">
-            {impressions.toLocaleString()}
-          </Typography>
+          <EditOutlined sx={{ fontSize: 16 }} className="text-neutral-400" />
         </div>
       </div>
-
-      {/* Social Links */}
-      <div className="mb-6">
-        <Typography variant="subtitle1" fontWeight="600" className="mb-3 flex items-center gap-2">
-          <Globe size={18} />
-          Social Links
-        </Typography>
-        
-        <div className="space-y-2">
-          <button className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-50 rounded-lg">
-                <Linkedin size={16} className="text-blue-600" />
-              </div>
-              <div className="text-left">
-                <Typography fontWeight="500">LinkedIn</Typography>
-                <Typography variant="caption" color={medium}>
-                  Professional Network
-                </Typography>
-              </div>
-            </div>
-            <EditOutlined sx={{ color: main, fontSize: '18px' }} />
-          </button>
-          
-          <button className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-sky-50 rounded-lg">
-                <Twitter size={16} className="text-sky-600" />
-              </div>
-              <div className="text-left">
-                <Typography fontWeight="500">Twitter</Typography>
-                <Typography variant="caption" color={medium}>
-                  Social Network
-                </Typography>
-              </div>
-            </div>
-            <EditOutlined sx={{ color: main, fontSize: '18px' }} />
-          </button>
-          
-          <button className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-50 rounded-lg">
-                <GitHub size={16} className="text-purple-600" />
-              </div>
-              <div className="text-left">
-                <Typography fontWeight="500">GitHub</Typography>
-                <Typography variant="caption" color={medium}>
-                  Code Portfolio
-                </Typography>
-              </div>
-            </div>
-            <EditOutlined sx={{ color: main, fontSize: '18px' }} />
-          </button>
-        </div>
-      </div>
-
-      {/* Share Profile */}
-      <div className="pt-6 border-t border-gray-100">
-        <button className="w-full flex items-center justify-center gap-2 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-xl transition-all group">
-          <Share2 size={18} className="text-blue-600 group-hover:scale-110 transition-transform" />
-          <Typography fontWeight="500" className="text-blue-600">
-            Share Profile
-          </Typography>
-        </button>
-      </div>
-    </WidgetWrapper>
+    </aside>
   );
 };
 
 export default UserWidget;
+
 
 
 // import {

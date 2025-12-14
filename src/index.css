@@ -1,12 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@400;500;700&display=swap');
-
 
 html,
 body,
 #root,
-.app{
-       height:100%;
-       width:100%;
-       font-family: "Rubik", sans-serif;
+.app {
+  height: 100%;
+  width: 100%;
+  font-family: "Rubik", sans-serif;
+}
+
+/* Optional: default dark background */
+body {
+  @apply bg-black text-neutral-100;
 }

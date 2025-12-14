@@ -1,60 +1,36 @@
-
 import { useState } from "react";
-import {
-  Box,
-  Button,
-  TextField,
-  useMediaQuery,
-  Typography,
-  useTheme,
-  Alert,
-  Snackbar,
-  CircularProgress,
-  IconButton,
-  InputAdornment,
-} from "@mui/material";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../../state/index";
 import Dropzone from "react-dropzone";
-import {
-  User,
-  Mail,
-  Lock,
-  MapPin,
-  Briefcase,
-  UserPlus,
-  LogIn,
-  Eye,
-  EyeOff,
-  Upload,
-  CheckCircle,
-  ArrowRight,
-  ChevronRight,
-  Home,
-  Users,
-} from "lucide-react";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import CircularProgress from "@mui/material/CircularProgress";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 const registerSchema = yup.object().shape({
   firstName: yup.string().required("First name is required"),
   lastName: yup.string().required("Last name is required"),
-  email: yup.string().email("Invalid email format").required("Email is required"),
-  password: yup.string()
-    .min(6, "Password must be at least 6 characters")
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])/, "Must contain uppercase and lowercase letters")
+  email: yup.string().email("Invalid email").required("Email is required"),
+  password: yup
+    .string()
+    .min(5, "Password must be at least 5 characters")
     .required("Password is required"),
   location: yup.string().required("Location is required"),
   occupation: yup.string().required("Occupation is required"),
-  picture: yup.mixed().test("fileRequired", "Profile picture is required", (value) => {
-    return value !== null && value !== undefined;
-  }),
+  picture: yup
+    .mixed()
+    .test(
+      "fileRequired",
+      "Profile picture is required",
+      (value) => value !== null && value !== undefined
+    ),
 });
 
 const loginSchema = yup.object().shape({
-  email: yup.string().email("Invalid email format").required("Email is required"),
+  email: yup.string().email("Invalid email").required("Email is required"),
   password: yup.string().required("Password is required"),
 });
 
@@ -76,13 +52,14 @@ const initialValuesLogin = {
 const Form = () => {
   const [pageType, setPageType] = useState("login");
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [alert, setAlert] = useState({ open: false, message: "", severity: "info" });
-  const { palette } = useTheme();
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const isNonMobile = useMediaQuery("(min-width:768px)");
-  const isTablet = useMediaQuery("(min-width:600px)");
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
 
@@ -92,7 +69,8 @@ const Form = () => {
 
   const register = async (values, onSubmitProps) => {
     setIsLoading(true);
-    
+    console.log("Register values:", values);
+
     try {
       const formData = new FormData();
       formData.append("firstName", values.firstName);
@@ -101,24 +79,39 @@ const Form = () => {
       formData.append("password", values.password);
       formData.append("location", values.location);
       formData.append("occupation", values.occupation);
-      
+
       if (values.picture) {
         formData.append("picture", values.picture);
       }
 
-      const response = await fetch("https://echocircle-backend.vercel.app/auth/register", {
-        method: "POST",
-        body: formData,
-      });
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
 
+      const response = await fetch(
+        "https://echocircle-backend.vercel.app/auth/register",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      console.log("Response status:", response.status);
       const result = await response.json();
-      
+      console.log("Response data:", result);
+
       if (!response.ok) {
-        throw new Error(result.message || `Registration failed with status: ${response.status}`);
+        throw new Error(
+          result.message ||
+            `Registration failed with status: ${response.status}`
+        );
       }
 
       if (result.success) {
-        showAlert(result.message || "Registration successful! Please login.", "success");
+        showAlert(
+          result.message || "Registration successful! Please login.",
+          "success"
+        );
         onSubmitProps.resetForm();
         setPageType("login");
       } else {
@@ -135,16 +128,23 @@ const Form = () => {
   const login = async (values, onSubmitProps) => {
     setIsLoading(true);
     try {
-      const response = await fetch("https://echocircle-backend.vercel.app/auth/login", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+      console.log("Login attempt for:", values.email);
 
+      const response = await fetch(
+        "https://echocircle-backend.vercel.app/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        }
+      );
+
+      console.log("Login response status:", response.status);
       const result = await response.json();
-      
+      console.log("Login response data:", result);
+
       if (!response.ok) {
         throw new Error(result.message || `Login failed: ${response.status}`);
       }
@@ -165,7 +165,9 @@ const Form = () => {
       }
     } catch (error) {
       console.error("Login error:", error);
-      showAlert(error.message || "Login failed. Please check your credentials.");
+      showAlert(
+        error.message || "Login failed. Please check your credentials."
+      );
     } finally {
       setIsLoading(false);
       onSubmitProps.resetForm();
@@ -173,6 +175,7 @@ const Form = () => {
   };
 
   const handleFormSubmit = async (values, onSubmitProps) => {
+    console.log("Form submitted, pageType:", pageType);
     if (isLogin) {
       await login(values, onSubmitProps);
     } else if (isRegister) {
@@ -182,532 +185,341 @@ const Form = () => {
 
   return (
     <>
+      {/* Snackbar for messages (kept same behavior) */}
       <Snackbar
         open={alert.open}
-        autoHideDuration={4000}
+        autoHideDuration={6000}
         onClose={() => setAlert({ ...alert, open: false })}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert 
-          onClose={() => setAlert({ ...alert, open: false })} 
+        <Alert
+          onClose={() => setAlert({ ...alert, open: false })}
           severity={alert.severity}
-          sx={{ 
-            width: '100%',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            borderRadius: '12px'
-          }}
-          icon={
-            alert.severity === "success" ? <CheckCircle size={20} /> : undefined
-          }
+          sx={{ width: "100%" }}
         >
           {alert.message}
         </Alert>
       </Snackbar>
 
-      <div className="w-full max-w-4xl mx-auto">
-        {/* Header with Breadcrumb */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 text-gray-400 mb-3">
-            <Home size={16} />
-            <ChevronRight size={14} />
-            <span className="text-sm">Authentication</span>
-            <ChevronRight size={14} />
-            <span className="text-sm font-medium text-gray-600">
-              {isLogin ? "Login" : "Register"}
-            </span>
-          </div>
-          
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                {isLogin ? "Welcome Back" : "Join EchoCircle"}
-              </h1>
-              <p className="text-gray-600 mt-1">
-                {isLogin 
-                  ? "Sign in to your account to continue" 
-                  : "Create your account and start connecting"}
-              </p>
-            </div>
-            
-            <div className={`px-4 py-2 rounded-xl ${isLogin ? 'bg-blue-50 text-blue-700' : 'bg-emerald-50 text-emerald-700'} flex items-center gap-2`}>
-              {isLogin ? <LogIn size={18} /> : <UserPlus size={18} />}
-              <span className="text-sm font-medium">
-                {isLogin ? "Login Mode" : "Registration Mode"}
-              </span>
-            </div>
-          </div>
-        </div>
+      <Formik
+        onSubmit={handleFormSubmit}
+        initialValues={isLogin ? initialValuesLogin : initialValuesRegister}
+        validationSchema={isLogin ? loginSchema : registerSchema}
+        validateOnBlur={true}
+        validateOnChange={true}
+      >
+        {({
+          values,
+          errors,
+          touched,
+          handleBlur,
+          handleChange,
+          handleSubmit,
+          setFieldValue,
+          resetForm,
+          isValid,
+        }) => (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Grid wrapper */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {isRegister && (
+                <>
+                  {/* First Name */}
+                  <div className="flex flex-col gap-1">
+                    <label
+                      htmlFor="firstName"
+                      className="text-xs font-medium uppercase tracking-wide text-neutral-300"
+                    >
+                      First Name
+                    </label>
+                    <input
+                      id="firstName"
+                      name="firstName"
+                      type="text"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values.firstName}
+                      disabled={isLoading}
+                      className={`w-full rounded-lg border border-neutral-700 bg-black/60 px-3 py-2 text-sm text-neutral-50 placeholder:text-neutral-500 outline-none transition focus:border-red-500 focus:ring-1 focus:ring-red-600 ${
+                        touched.firstName && errors.firstName
+                          ? "border-red-500"
+                          : ""
+                      }`}
+                      placeholder="Enter your first name"
+                    />
+                    {touched.firstName && errors.firstName && (
+                      <p className="text-xs text-red-400">
+                        {errors.firstName}
+                      </p>
+                    )}
+                  </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Info */}
-          <div className="lg:col-span-1">
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-100 p-6 sticky top-6">
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Users size={20} />
-                Why Join EchoCircle?
-              </h3>
-              
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Users size={16} className="text-blue-600" />
+                  {/* Last Name */}
+                  <div className="flex flex-col gap-1">
+                    <label
+                      htmlFor="lastName"
+                      className="text-xs font-medium uppercase tracking-wide text-neutral-300"
+                    >
+                      Last Name
+                    </label>
+                    <input
+                      id="lastName"
+                      name="lastName"
+                      type="text"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values.lastName}
+                      disabled={isLoading}
+                      className={`w-full rounded-lg border border-neutral-700 bg-black/60 px-3 py-2 text-sm text-neutral-50 placeholder:text-neutral-500 outline-none transition focus:border-red-500 focus:ring-1 focus:ring-red-600 ${
+                        touched.lastName && errors.lastName
+                          ? "border-red-500"
+                          : ""
+                      }`}
+                      placeholder="Enter your last name"
+                    />
+                    {touched.lastName && errors.lastName && (
+                      <p className="text-xs text-red-400">
+                        {errors.lastName}
+                      </p>
+                    )}
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Connect with Friends</p>
-                    <p className="text-xs text-gray-600">Build your professional network</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-emerald-100 rounded-lg">
-                    <Briefcase size={16} className="text-emerald-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Share Experiences</p>
-                    <p className="text-xs text-gray-600">Post updates and engage with community</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <MapPin size={16} className="text-purple-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Discover People</p>
-                    <p className="text-xs text-gray-600">Find people with similar interests</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-8 pt-6 border-t border-blue-200">
-                <div className="text-sm text-gray-600 mb-2">Already have an account?</div>
-                <button
-                  onClick={() => {
-                    if (!isLoading) {
-                      setPageType(isLogin ? "register" : "login");
-                    }
-                  }}
-                  disabled={isLoading}
-                  className="w-full flex items-center justify-between p-3 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${isLogin ? 'bg-emerald-100' : 'bg-blue-100'}`}>
-                      {isLogin ? <UserPlus size={16} className="text-emerald-600" /> : <LogIn size={16} className="text-blue-600" />}
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">
-                      {isLogin ? "Create Account" : "Sign In"}
-                    </span>
-                  </div>
-                  <ArrowRight size={16} className="text-gray-400" />
-                </button>
-              </div>
-            </div>
-          </div>
 
-          {/* Right Column - Form */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-              {/* Form Header */}
-              <div className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white px-6 py-5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">
-                      {isLogin ? "Sign In to Your Account" : "Create New Account"}
-                    </h2>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {isLogin 
-                        ? "Enter your credentials to access your account"
-                        : "Fill in your details to create an account"
-                      }
+                  {/* Location */}
+                  <div className="flex flex-col gap-1 sm:col-span-2">
+                    <label
+                      htmlFor="location"
+                      className="text-xs font-medium uppercase tracking-wide text-neutral-300"
+                    >
+                      Location
+                    </label>
+                    <input
+                      id="location"
+                      name="location"
+                      type="text"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values.location}
+                      disabled={isLoading}
+                      className={`w-full rounded-lg border border-neutral-700 bg-black/60 px-3 py-2 text-sm text-neutral-50 placeholder:text-neutral-500 outline-none transition focus:border-red-500 focus:ring-1 focus:ring-red-600 ${
+                        touched.location && errors.location
+                          ? "border-red-500"
+                          : ""
+                      }`}
+                      placeholder="Where are you based?"
+                    />
+                    {touched.location && errors.location && (
+                      <p className="text-xs text-red-400">
+                        {errors.location}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Occupation */}
+                  <div className="flex flex-col gap-1 sm:col-span-2">
+                    <label
+                      htmlFor="occupation"
+                      className="text-xs font-medium uppercase tracking-wide text-neutral-300"
+                    >
+                      Occupation
+                    </label>
+                    <input
+                      id="occupation"
+                      name="occupation"
+                      type="text"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values.occupation}
+                      disabled={isLoading}
+                      className={`w-full rounded-lg border border-neutral-700 bg-black/60 px-3 py-2 text-sm text-neutral-50 placeholder:text-neutral-500 outline-none transition focus:border-red-500 focus:ring-1 focus:ring-red-600 ${
+                        touched.occupation && errors.occupation
+                          ? "border-red-500"
+                          : ""
+                      }`}
+                      placeholder="What do you do?"
+                    />
+                    {touched.occupation && errors.occupation && (
+                      <p className="text-xs text-red-400">
+                        {errors.occupation}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Picture Upload */}
+                  <div className="sm:col-span-2">
+                    <p className="mb-1 text-xs font-medium uppercase tracking-wide text-neutral-300">
+                      Profile Picture <span className="text-red-500">*</span>
                     </p>
-                  </div>
-                  <div className={`h-10 w-1.5 rounded-full ${isLogin ? 'bg-blue-500' : 'bg-emerald-500'}`}></div>
-                </div>
-              </div>
-
-              {/* Form Content */}
-              <div className="p-6">
-                <Formik
-                  onSubmit={handleFormSubmit}
-                  initialValues={isLogin ? initialValuesLogin : initialValuesRegister}
-                  validationSchema={isLogin ? loginSchema : registerSchema}
-                  validateOnBlur={true}
-                  validateOnChange={true}
-                >
-                  {({
-                    values,
-                    errors,
-                    touched,
-                    handleBlur,
-                    handleChange,
-                    handleSubmit,
-                    setFieldValue,
-                    resetForm,
-                    isValid,
-                  }) => (
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {isRegister && (
-                          <>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-900 mb-2">
-                                First Name
-                              </label>
-                              <TextField
-                                fullWidth
-                                placeholder="John"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.firstName}
-                                name="firstName"
-                                error={Boolean(touched.firstName) && Boolean(errors.firstName)}
-                                helperText={touched.firstName && errors.firstName}
-                                disabled={isLoading}
-                                InputProps={{
-                                  startAdornment: (
-                                    <InputAdornment position="start">
-                                      <User size={18} className="text-gray-400" />
-                                    </InputAdornment>
-                                  ),
-                                }}
-                                sx={{
-                                  '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                  }
-                                }}
-                              />
-                            </div>
-                            
-                            <div>
-                              <label className="block text-sm font-medium text-gray-900 mb-2">
-                                Last Name
-                              </label>
-                              <TextField
-                                fullWidth
-                                placeholder="Doe"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.lastName}
-                                name="lastName"
-                                error={Boolean(touched.lastName) && Boolean(errors.lastName)}
-                                helperText={touched.lastName && errors.lastName}
-                                disabled={isLoading}
-                                InputProps={{
-                                  startAdornment: (
-                                    <InputAdornment position="start">
-                                      <User size={18} className="text-gray-400" />
-                                    </InputAdornment>
-                                  ),
-                                }}
-                                sx={{
-                                  '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                  }
-                                }}
-                              />
-                            </div>
-
-                            <div>
-                              <label className="block text-sm font-medium text-gray-900 mb-2">
-                                Location
-                              </label>
-                              <TextField
-                                fullWidth
-                                placeholder="New York, USA"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.location}
-                                name="location"
-                                error={Boolean(touched.location) && Boolean(errors.location)}
-                                helperText={touched.location && errors.location}
-                                disabled={isLoading}
-                                InputProps={{
-                                  startAdornment: (
-                                    <InputAdornment position="start">
-                                      <MapPin size={18} className="text-gray-400" />
-                                    </InputAdornment>
-                                  ),
-                                }}
-                                sx={{
-                                  '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                  }
-                                }}
-                              />
-                            </div>
-
-                            <div>
-                              <label className="block text-sm font-medium text-gray-900 mb-2">
-                                Occupation
-                              </label>
-                              <TextField
-                                fullWidth
-                                placeholder="Software Developer"
-                                onBlur={handleBlur}
-                                onChange={handleChange}
-                                value={values.occupation}
-                                name="occupation"
-                                error={Boolean(touched.occupation) && Boolean(errors.occupation)}
-                                helperText={touched.occupation && errors.occupation}
-                                disabled={isLoading}
-                                InputProps={{
-                                  startAdornment: (
-                                    <InputAdornment position="start">
-                                      <Briefcase size={18} className="text-gray-400" />
-                                    </InputAdornment>
-                                  ),
-                                }}
-                                sx={{
-                                  '& .MuiOutlinedInput-root': {
-                                    borderRadius: '12px',
-                                  }
-                                }}
-                              />
-                            </div>
-
-                            {/* Picture Upload Section */}
-                            <div className="md:col-span-2">
-                              <label className="block text-sm font-medium text-gray-900 mb-2">
-                                Profile Picture
-                              </label>
-                              <Dropzone
-                                accept={{
-                                  'image/jpeg': ['.jpeg', '.jpg'],
-                                  'image/png': ['.png']
-                                }}
-                                maxFiles={1}
-                                maxSize={5242880}
-                                onDrop={(acceptedFiles) => {
-                                  if (acceptedFiles.length > 0 && !isLoading) {
-                                    setFieldValue("picture", acceptedFiles[0]);
-                                  }
-                                }}
-                                disabled={isLoading}
-                              >
-                                {({ getRootProps, getInputProps, isDragActive }) => (
-                                  <div
-                                    {...getRootProps()}
-                                    className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all cursor-pointer ${
-                                      errors.picture && touched.picture 
-                                        ? 'border-red-300 bg-red-50' 
-                                        : isDragActive 
-                                        ? 'border-blue-300 bg-blue-50' 
-                                        : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
-                                    } ${isLoading ? 'cursor-not-allowed opacity-70' : ''}`}
-                                  >
-                                    <input {...getInputProps()} />
-                                    <div className="flex flex-col items-center gap-3">
-                                      <div className={`p-3 rounded-full ${
-                                        values.picture 
-                                          ? 'bg-green-100 text-green-600' 
-                                          : 'bg-blue-100 text-blue-600'
-                                      }`}>
-                                        {values.picture ? <CheckCircle size={24} /> : <Upload size={24} />}
-                                      </div>
-                                      <div>
-                                        {!values.picture ? (
-                                          <>
-                                            <p className="text-gray-900 font-medium">
-                                              {isDragActive ? 'Drop the image here' : 'Upload Profile Picture'}
-                                            </p>
-                                            <p className="text-sm text-gray-500 mt-1">
-                                              Drag & drop or click to browse
-                                            </p>
-                                            <p className="text-xs text-gray-400 mt-1">
-                                              JPG, PNG up to 5MB
-                                            </p>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <p className="text-gray-900 font-medium">{values.picture.name}</p>
-                                            <p className="text-sm text-gray-500">
-                                              {(values.picture.size / 1024 / 1024).toFixed(2)} MB
-                                            </p>
-                                          </>
-                                        )}
-                                      </div>
-                                      {!values.picture && (
-                                        <button
-                                          type="button"
-                                          className="mt-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
-                                          onClick={(e) => e.stopPropagation()}
-                                        >
-                                          Browse files
-                                        </button>
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-                              </Dropzone>
-                              {errors.picture && touched.picture && (
-                                <p className="mt-2 text-sm text-red-600">{errors.picture}</p>
-                              )}
-                            </div>
-                          </>
-                        )}
-
-                        <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-gray-900 mb-2">
-                            Email Address
-                          </label>
-                          <TextField
-                            fullWidth
-                            placeholder="you@example.com"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            value={values.email}
-                            name="email"
-                            type="email"
-                            error={Boolean(touched.email) && Boolean(errors.email)}
-                            helperText={touched.email && errors.email}
-                            disabled={isLoading}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <Mail size={18} className="text-gray-400" />
-                                </InputAdornment>
-                              ),
-                            }}
-                            sx={{
-                              '& .MuiOutlinedInput-root': {
-                                borderRadius: '12px',
-                              }
-                            }}
-                          />
-                        </div>
-
-                        <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-gray-900 mb-2">
-                            Password
-                          </label>
-                          <TextField
-                            fullWidth
-                            placeholder="••••••••"
-                            type={showPassword ? "text" : "password"}
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            value={values.password}
-                            name="password"
-                            error={Boolean(touched.password) && Boolean(errors.password)}
-                            helperText={touched.password && errors.password}
-                            disabled={isLoading}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <Lock size={18} className="text-gray-400" />
-                                </InputAdornment>
-                              ),
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  <IconButton
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    edge="end"
-                                    disabled={isLoading}
-                                    size="small"
-                                  >
-                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                  </IconButton>
-                                </InputAdornment>
-                              ),
-                            }}
-                            sx={{
-                              '& .MuiOutlinedInput-root': {
-                                borderRadius: '12px',
-                              }
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Submit Button */}
-                      <div className="pt-4">
-                        <Button
-                          fullWidth
-                          type="submit"
-                          disabled={isLoading || (isRegister && !isValid)}
-                          variant="contained"
-                          startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
-                          sx={{
-                            py: 2,
-                            borderRadius: '12px',
-                            backgroundColor: isLogin ? palette.primary.main : palette.success.main,
-                            fontSize: '16px',
-                            fontWeight: '600',
-                            textTransform: 'none',
-                            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
-                            '&:hover': {
-                              backgroundColor: isLogin ? palette.primary.dark : palette.success.dark,
-                              boxShadow: '0 6px 16px rgba(37, 99, 235, 0.3)',
-                              transform: 'translateY(-1px)',
-                            },
-                            '&:active': {
-                              transform: 'translateY(0)',
-                            },
-                            '&:disabled': {
-                              backgroundColor: palette.grey[300],
-                              color: palette.grey[500],
-                              boxShadow: 'none',
-                              transform: 'none',
-                            }
-                          }}
+                    <Dropzone
+                      accept={{
+                        "image/jpeg": [".jpeg", ".jpg"],
+                        "image/png": [".png"],
+                      }}
+                      maxFiles={1}
+                      maxSize={5242880}
+                      onDrop={(acceptedFiles) => {
+                        if (acceptedFiles.length > 0) {
+                          setFieldValue("picture", acceptedFiles[0]);
+                        }
+                      }}
+                      disabled={isLoading}
+                    >
+                      {({
+                        getRootProps,
+                        getInputProps,
+                        isDragActive,
+                        isDragReject,
+                      }) => (
+                        <div
+                          {...getRootProps()}
+                          className={`flex cursor-pointer flex-col rounded-xl border-2 border-dashed bg-black/40 px-4 py-5 text-center text-sm transition ${
+                            touched.picture && errors.picture
+                              ? "border-red-500"
+                              : "border-red-700/60"
+                          } ${
+                            isDragActive
+                              ? "border-red-500 bg-red-950/40"
+                              : "hover:border-red-500 hover:bg-red-950/20"
+                          } ${
+                            isDragReject ? "border-red-600 bg-red-950/40" : ""
+                          }`}
                         >
-                          {isLoading ? (
-                            <span className="flex items-center gap-2">
-                              <CircularProgress size={20} color="inherit" />
-                              {isLogin ? 'Signing In...' : 'Creating Account...'}
-                            </span>
-                          ) : isLogin ? 'Sign In to Account' : 'Create Account'}
-                        </Button>
+                          <input {...getInputProps()} />
+                          {!values.picture ? (
+                            <div className="flex flex-col items-center gap-2">
+                              <EditOutlinedIcon className="text-neutral-400" />
+                              <p className="text-xs text-neutral-300">
+                                {isDragActive
+                                  ? "Drop the image here..."
+                                  : "Drag & drop a profile picture, or click to select"}
+                              </p>
+                              <p className="text-[11px] text-neutral-500">
+                                JPEG or PNG, up to 5MB
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-between gap-3 text-left">
+                              <div>
+                                <p className="text-sm font-medium text-neutral-100">
+                                  {values.picture.name}
+                                </p>
+                                <p className="text-[11px] text-neutral-500">
+                                  {(values.picture.size / 1024 / 1024).toFixed(
+                                    2
+                                  )}{" "}
+                                  MB
+                                </p>
+                              </div>
+                              <EditOutlinedIcon className="text-neutral-400" />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </Dropzone>
+                    {touched.picture && errors.picture && (
+                      <p className="mt-1 text-xs text-red-400">
+                        {errors.picture}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
 
-                        {isRegister && (
-                          <div className="mt-4">
-                            <div className="text-xs text-gray-500 mb-2">
-                              Password requirements:
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className={`flex items-center gap-1 ${values.password.length >= 6 ? 'text-green-600' : 'text-gray-400'}`}>
-                                <div className={`h-1.5 w-1.5 rounded-full ${values.password.length >= 6 ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                                <span className="text-xs">At least 6 characters</span>
-                              </div>
-                              <div className={`flex items-center gap-1 ${/^(?=.*[a-z])(?=.*[A-Z])/.test(values.password) ? 'text-green-600' : 'text-gray-400'}`}>
-                                <div className={`h-1.5 w-1.5 rounded-full ${/^(?=.*[a-z])(?=.*[A-Z])/.test(values.password) ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                                <span className="text-xs">Upper & lowercase</span>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </form>
-                  )}
-                </Formik>
+              {/* Email */}
+              <div className="flex flex-col gap-1 sm:col-span-2">
+                <label
+                  htmlFor="email"
+                  className="text-xs font-medium uppercase tracking-wide text-neutral-300"
+                >
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.email}
+                  disabled={isLoading}
+                  className={`w-full rounded-lg border border-neutral-700 bg-black/60 px-3 py-2 text-sm text-neutral-50 placeholder:text-neutral-500 outline-none transition focus:border-red-500 focus:ring-1 focus:ring-red-600 ${
+                    touched.email && errors.email ? "border-red-500" : ""
+                  }`}
+                  placeholder="you@example.com"
+                />
+                {touched.email && errors.email && (
+                  <p className="text-xs text-red-400">{errors.email}</p>
+                )}
               </div>
 
-              {/* Form Footer */}
-              <div className="border-t border-gray-100 bg-gray-50/50 px-6 py-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="text-sm text-gray-500">
-                    <span className="font-medium text-gray-700">
-                      {isLogin ? 'Secure Login' : 'Account Creation'}
-                    </span> • Your data is protected
-                  </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-                      <span className="text-xs text-gray-600">System Active</span>
-                    </div>
-                  </div>
-                </div>
+              {/* Password */}
+              <div className="flex flex-col gap-1 sm:col-span-2">
+                <label
+                  htmlFor="password"
+                  className="text-xs font-medium uppercase tracking-wide text-neutral-300"
+                >
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.password}
+                  disabled={isLoading}
+                  className={`w-full rounded-lg border border-neutral-700 bg-black/60 px-3 py-2 text-sm text-neutral-50 placeholder:text-neutral-500 outline-none transition focus:border-red-500 focus:ring-1 focus:ring-red-600 ${
+                    touched.password && errors.password
+                      ? "border-red-500"
+                      : ""
+                  }`}
+                  placeholder="Enter your password"
+                />
+                {touched.password && errors.password && (
+                  <p className="text-xs text-red-400">{errors.password}</p>
+                )}
               </div>
             </div>
-          </div>
-        </div>
-      </div>
+
+            {/* Submit + Toggle */}
+            <div className="space-y-3 pt-2">
+              <button
+                type="submit"
+                disabled={isLoading || (!isValid && isRegister)}
+                className="flex w-full items-center justify-center rounded-full bg-red-600 px-4 py-3 text-sm font-semibold uppercase tracking-wide text-black transition hover:bg-red-500 disabled:cursor-not-allowed disabled:bg-red-900/70 disabled:text-neutral-400"
+              >
+                {isLoading ? (
+                  <CircularProgress size={20} color="inherit" />
+                ) : isLogin ? (
+                  "Login"
+                ) : (
+                  "Register"
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (!isLoading) {
+                    setPageType(isLogin ? "register" : "login");
+                    resetForm();
+                  }
+                }}
+                className="w-full text-center text-xs text-red-400 underline underline-offset-4 transition hover:text-red-300 disabled:cursor-not-allowed"
+                disabled={isLoading}
+              >
+                {isLogin
+                  ? "Don't have an account? Sign up here."
+                  : "Already have an account? Login here."}
+              </button>
+            </div>
+          </form>
+        )}
+      </Formik>
     </>
   );
 };
 
 export default Form;
+
 
 // import { useState } from "react";
 // import {
