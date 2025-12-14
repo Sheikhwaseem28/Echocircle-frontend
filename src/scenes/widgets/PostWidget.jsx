@@ -1,13 +1,21 @@
-import {
-  ChatBubbleOutlineOutlined,
-  FavoriteBorderOutlined,
-  FavoriteOutlined,
-  ShareOutlined,
-} from "@mui/icons-material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Friend from "../../components/Friend";
 import { setPost } from "../../state/index";
+import {
+  Heart,
+  MessageCircle,
+  Share2,
+  Bookmark,
+  MoreVertical,
+  Send,
+  Smile,
+  Globe,
+  Users,
+  Lock,
+  Image as ImageIcon,
+  ExternalLink,
+} from "lucide-react";
 
 const PostWidget = ({
   postId,
@@ -19,15 +27,24 @@ const PostWidget = ({
   userPicturePath,
   likes = {},
   comments = [],
+  audience = "public",
+  tags = [],
 }) => {
   const [isCommentsVisible, setIsCommentsVisible] = useState(false);
+  const [newComment, setNewComment] = useState("");
+  const [isLiked, setIsLiked] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [showActions, setShowActions] = useState(false);
+  const [showShareOptions, setShowShareOptions] = useState(false);
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user._id);
-  const isLiked = Boolean(likes[loggedInUserId]);
-  const likeCount = Object.keys(likes).length;
+  const likeCount = Object.keys(likes).length + (isLiked && !likes[loggedInUserId] ? 1 : 0);
 
   const handleLike = async () => {
+    const newLikedState = !isLiked;
+    setIsLiked(newLikedState);
+    
     try {
       const response = await fetch(
         `https://echocircle-backend.vercel.app/posts/${postId}/like`,
@@ -46,110 +63,324 @@ const PostWidget = ({
         dispatch(setPost({ post: updatedPost }));
       } else {
         console.error("Failed to like post");
+        // Revert if API fails
+        setIsLiked(!newLikedState);
       }
     } catch (error) {
       console.error("Error liking post:", error);
+      setIsLiked(!newLikedState);
     }
   };
 
+  const handleCommentSubmit = (e) => {
+    e.preventDefault();
+    if (newComment.trim()) {
+      // Add comment logic here
+      console.log("New comment:", newComment);
+      setNewComment("");
+    }
+  };
+
+  const handleShare = (platform) => {
+    console.log(`Sharing to ${platform}`);
+    setShowShareOptions(false);
+  };
+
+  const getAudienceIcon = () => {
+    switch (audience) {
+      case "private":
+        return <Lock size={12} />;
+      case "friends":
+        return <Users size={12} />;
+      default:
+        return <Globe size={12} />;
+    }
+  };
+
+  const getAudienceLabel = () => {
+    switch (audience) {
+      case "private":
+        return "Private";
+      case "friends":
+        return "Friends Only";
+      default:
+        return "Public";
+    }
+  };
+
+  const shareOptions = [
+    { platform: "copy", label: "Copy Link", icon: "🔗" },
+    { platform: "message", label: "Send in Message", icon: "💬" },
+    { platform: "twitter", label: "Share on Twitter", icon: "🐦" },
+    { platform: "facebook", label: "Share on Facebook", icon: "📘" },
+  ];
+
+  const formatCount = (count) => {
+    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+    if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
+    return count;
+  };
+
   return (
-    <article className="space-y-3">
-      {/* Header: author */}
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <Friend
-            friendId={postUserId}
-            name={name}
-            subtitle={location}
-            userPicturePath={userPicturePath}
-          />
+    <article className="group">
+      {/* Post Header */}
+      <div className="mb-4">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-red-500/20 flex items-center justify-center">
+                <div className="h-8 w-8 rounded-xl bg-gray-800 flex items-center justify-center text-white font-semibold">
+                  {name?.[0] || "U"}
+                </div>
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-white">{name}</h3>
+                  <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-gray-800/50 text-gray-300">
+                    {getAudienceIcon()}
+                    <span>{getAudienceLabel()}</span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  {location && <span>📍 {location}</span>}
+                  <span>•</span>
+                  <span>Just now</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="relative">
+            <button
+              onClick={() => setShowActions(!showActions)}
+              className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/30 transition-colors"
+            >
+              <MoreVertical size={20} />
+            </button>
+            
+            {showActions && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowActions(false)}
+                />
+                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-gray-800 bg-gray-900/95 backdrop-blur-xl shadow-2xl z-50">
+                  <button className="flex items-center gap-3 w-full p-3 text-sm text-gray-300 hover:bg-gray-800/50 hover:text-white transition-colors rounded-t-xl">
+                    <Bookmark size={16} />
+                    {isBookmarked ? "Remove bookmark" : "Save post"}
+                  </button>
+                  <button className="flex items-center gap-3 w-full p-3 text-sm text-gray-300 hover:bg-gray-800/50 hover:text-white transition-colors">
+                    <ExternalLink size={16} />
+                    Open in new tab
+                  </button>
+                  <button className="flex items-center gap-3 w-full p-3 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors rounded-b-xl">
+                    Report post
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Text */}
+      {/* Post Description */}
       {description && (
-        <p className="text-sm leading-relaxed text-neutral-100">
-          {description}
-        </p>
+        <div className="mb-4">
+          <p className="text-gray-100 leading-relaxed whitespace-pre-line">
+            {description}
+          </p>
+        </div>
       )}
 
-      {/* Image */}
+      {/* Tags */}
+      {tags && tags.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {tags.map((tag, index) => (
+            <span
+              key={index}
+              className="text-xs px-2 py-1 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20"
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Post Image */}
       {picturePath && (
-        <div className="flex h-72 w-full items-center justify-center overflow-hidden rounded-2xl border border-red-900/70 bg-black/80">
-          {picturePath.startsWith("http") ||
-          picturePath.startsWith("data:image") ? (
-            <img
-              src={picturePath}
-              alt="post"
-              className="h-full w-full object-cover"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.style.display = "none";
-                e.target.parentElement.innerHTML =
-                  '<div class="text-xs text-neutral-500">Image not available</div>';
-              }}
-            />
+        <div className="mb-4 rounded-xl overflow-hidden border border-gray-800 group-hover:border-gray-700 transition-all duration-300">
+          <div className="relative aspect-video bg-gradient-to-br from-gray-900 to-black">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center">
+                <ImageIcon className="h-12 w-12 text-gray-600 mx-auto mb-2" />
+                <p className="text-sm text-gray-400">Image preview</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {picturePath.includes('.jpg') ? 'JPG Image' : 'Media'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Engagement Stats */}
+      <div className="flex items-center justify-between text-sm text-gray-400 mb-4 px-1">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1">
+            <Heart size={14} className="text-rose-400" />
+            <span>{formatCount(likeCount)} likes</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <MessageCircle size={14} />
+            <span>{formatCount(comments.length)} comments</span>
+          </div>
+        </div>
+        <div className="text-xs text-gray-500">
+          {getAudienceLabel()}
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex items-center border-y border-gray-800/50 py-2 mb-4">
+        <button
+          onClick={handleLike}
+          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg transition-all ${
+            isLiked
+              ? "text-rose-400 hover:text-rose-300"
+              : "text-gray-400 hover:text-white hover:bg-gray-800/30"
+          }`}
+        >
+          {isLiked ? (
+            <Heart size={20} className="text-rose-400" />
           ) : (
-            <span className="text-xs text-neutral-500">Image preview</span>
+            <Heart size={20} />
+          )}
+          <span className="text-sm font-medium">Like</span>
+        </button>
+
+        <button
+          onClick={() => setIsCommentsVisible(!isCommentsVisible)}
+          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg transition-all ${
+            isCommentsVisible
+              ? "text-blue-400 hover:text-blue-300"
+              : "text-gray-400 hover:text-white hover:bg-gray-800/30"
+          }`}
+        >
+          <MessageCircle size={20} />
+          <span className="text-sm font-medium">Comment</span>
+        </button>
+
+        <div className="relative flex-1">
+          <button
+            onClick={() => setShowShareOptions(!showShareOptions)}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/30 transition-all"
+          >
+            <Share2 size={20} />
+            <span className="text-sm font-medium">Share</span>
+          </button>
+          
+          {showShareOptions && (
+            <>
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setShowShareOptions(false)}
+              />
+              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-56 rounded-xl border border-gray-800 bg-gray-900/95 backdrop-blur-xl shadow-2xl z-50">
+                <div className="p-3 border-b border-gray-800">
+                  <h4 className="text-sm font-medium text-white">Share this post</h4>
+                </div>
+                <div className="p-2">
+                  {shareOptions.map((option) => (
+                    <button
+                      key={option.platform}
+                      onClick={() => handleShare(option.platform)}
+                      className="flex items-center gap-3 w-full p-3 rounded-lg text-sm text-gray-300 hover:bg-gray-800/50 hover:text-white transition-colors"
+                    >
+                      <span>{option.icon}</span>
+                      <span>{option.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
         </div>
-      )}
 
-      {/* Actions */}
-      <div className="flex items-center justify-between text-xs text-neutral-300">
-        <div className="flex items-center gap-4">
-          {/* Like */}
-          <button
-            type="button"
-            onClick={handleLike}
-            aria-label="like post"
-            className="flex items-center gap-1"
-          >
-            {isLiked ? (
-              <FavoriteOutlined sx={{ fontSize: 18 }} className="text-red-500" />
-            ) : (
-              <FavoriteBorderOutlined sx={{ fontSize: 18 }} />
-            )}
-            <span>{likeCount}</span>
-          </button>
-
-          {/* Comments */}
-          <button
-            type="button"
-            onClick={() => setIsCommentsVisible(!isCommentsVisible)}
-            aria-label="toggle comments"
-            className="flex items-center gap-1"
-          >
-            <ChatBubbleOutlineOutlined sx={{ fontSize: 18 }} />
-            <span>{comments.length}</span>
-          </button>
-        </div>
-
-        {/* Share */}
         <button
-          type="button"
-          aria-label="share post"
-          className="flex items-center justify-center rounded-full border border-red-900/70 bg-black/70 px-2 py-1 hover:border-red-500"
+          onClick={() => setIsBookmarked(!isBookmarked)}
+          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/30 transition-all"
         >
-          <ShareOutlined sx={{ fontSize: 18 }} />
+          <Bookmark size={20} className={isBookmarked ? "fill-current text-amber-400" : ""} />
+          <span className="text-sm font-medium">Save</span>
         </button>
       </div>
 
-      {/* Divider */}
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-red-900/60 to-transparent" />
-
-      {/* Comments */}
+      {/* Comments Section */}
       {isCommentsVisible && (
-        <div className="space-y-2 border-l border-red-900/60 pl-3">
-          {comments.map((comment, index) => (
-            <div key={`${name}-${index}`} className="space-y-1">
-              <p className="text-xs text-neutral-100">{comment}</p>
-              <div className="h-px w-full bg-neutral-800/70" />
+        <div className="space-y-4">
+          {/* Existing Comments */}
+          {comments.length > 0 ? (
+            <div className="space-y-4">
+              <h4 className="text-sm font-medium text-gray-300">
+                Comments ({comments.length})
+              </h4>
+              {comments.map((comment, index) => (
+                <div key={index} className="flex gap-3">
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-rose-500/20 to-red-500/20 flex items-center justify-center flex-shrink-0">
+                    <div className="h-6 w-6 rounded-full bg-gray-800 flex items-center justify-center text-xs text-white">
+                      U
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="bg-gray-800/30 rounded-xl p-3">
+                      <p className="text-sm text-gray-100">{comment.text || comment}</p>
+                    </div>
+                    <div className="flex items-center gap-3 mt-2 ml-2 text-xs text-gray-500">
+                      <button className="hover:text-rose-400">Like</button>
+                      <button className="hover:text-blue-400">Reply</button>
+                      <span>2h ago</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-          {comments.length === 0 && (
-            <p className="text-xs text-neutral-500">No comments yet</p>
+          ) : (
+            <div className="text-center py-4">
+              <MessageCircle className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+              <p className="text-gray-400">No comments yet</p>
+              <p className="text-sm text-gray-500 mt-1">Be the first to comment</p>
+            </div>
           )}
+
+          {/* New Comment Input */}
+          <form onSubmit={handleCommentSubmit} className="flex gap-2">
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Write a comment..."
+                className="w-full rounded-xl border border-gray-800 bg-gray-900/30 py-2.5 pl-4 pr-12 text-sm text-white placeholder-gray-500 focus:border-blue-500/50 focus:outline-none focus:ring-1 focus:ring-blue-500/30"
+              />
+              <button
+                type="button"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white"
+              >
+                <Smile size={20} />
+              </button>
+            </div>
+            <button
+              type="submit"
+              disabled={!newComment.trim()}
+              className={`px-4 rounded-xl ${
+                newComment.trim()
+                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:shadow-lg hover:shadow-blue-500/25"
+                  : "bg-gray-800 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              <Send size={20} />
+            </button>
+          </form>
         </div>
       )}
     </article>
