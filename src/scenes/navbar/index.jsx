@@ -259,190 +259,178 @@ const Navbar = () => {
         </div>
       </div>
 
-{/* Mobile Menu - Professional & Wider */}
+{/* Mobile Menu - Optimized for Mobile */}
 {isMobileMenuToggled && (
   <div className="fixed inset-0 z-50 md:hidden">
-    {/* Backdrop */}
+    {/* Backdrop with smooth fade */}
     <div
-      className="absolute inset-0 bg-black/90 backdrop-blur-[100px]"
+      className="absolute inset-0 bg-black/80 transition-opacity duration-300 animate-fadeIn"
       onClick={() => setIsMobileMenuToggled(false)}
     />
 
-    {/* Main Menu Container - Wider (85% of screen) */}
-    <div className="absolute right-0 top-0 h-full w-[85vw] max-w-md
-      bg-gradient-to-b from-gray-900/15 via-gray-900/10 to-black/10 
-      border-l border-gray-800/25 
-      shadow-2xl 
-      backdrop-blur-[60px]">
+    {/* Main Menu Container - Slide in animation */}
+    <div className="absolute right-0 top-0 h-[65vh] w-full max-w-xs
+      bg-gradient-to-b from-gray-950 via-black to-gray-950
+      border-x border-gray-800/50
+      shadow-2xl shadow-black/50
+      animate-slideInRight
+      flex flex-col">
       
-      {/* Header - Professional Typography */}
-      <div className="border-b border-gray-800/25 p-5 
-        bg-gradient-to-r from-gray-900/20 to-black/20 
-        backdrop-blur-[40px]">
+      {/* Header - Compact design */}
+      <div className="border-b border-gray-800/50 p-4 bg-black/80 flex-shrink-0">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl 
-              bg-gradient-to-br from-rose-500/75 to-red-600/75 
-              backdrop-blur-[35px] 
-              shadow-xl shadow-rose-900/25">
-              <span className="text-sm font-bold tracking-wider text-white">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg 
+              bg-gradient-to-br from-rose-500 to-pink-600
+              shadow-lg shadow-rose-900/30">
+              <span className="text-xs font-bold text-white">
                 EC
               </span>
             </div>
-            <div className="bg-gradient-to-r from-gray-900/20 to-transparent 
-              rounded-xl px-4 py-2.5 
-              backdrop-blur-[35px]">
-              <h2 className="text-lg font-semibold text-white font-sans">Menu</h2>
-              <p className="text-xs text-gray-400/80 font-sans tracking-wide">EchoCircle</p>
+            <div>
+              <h2 className="text-sm font-semibold text-white font-sans">Menu</h2>
+              <p className="text-[10px] text-gray-400 font-sans tracking-wider">EchoCircle</p>
             </div>
           </div>
           <button
             onClick={() => setIsMobileMenuToggled(false)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl 
-              border border-gray-800/25 
-              bg-gray-900/25 
-              text-gray-300 
+            className="flex h-8 w-8 items-center justify-center rounded-lg 
+              border border-gray-800 
+              bg-gray-900/80 
+              text-gray-400 
               hover:text-white 
-              hover:bg-gray-800/35 
-              backdrop-blur-[35px] 
+              hover:bg-gray-800
+              hover:border-gray-700
               transition-all duration-200"
           >
-            <X size={22} />
+            <X size={18} />
           </button>
         </div>
       </div>
 
-      {/* User Info - Professional Layout */}
-      <div className="border-b border-gray-800/25 p-5 
-        bg-gradient-to-r from-gray-900/20 via-gray-900/15 to-transparent 
-        backdrop-blur-[40px]">
-        <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full 
-            bg-gradient-to-r from-rose-500/75 to-red-600/75 
-            backdrop-blur-[35px] 
-            shadow-xl shadow-rose-900/25">
-            <span className="text-xl font-semibold text-white font-sans">
-              {user.firstName?.[0]}
-            </span>
-          </div>
-          <div className="flex-1 bg-gradient-to-r from-gray-900/20 to-transparent 
-            rounded-xl px-4 py-3 
-            backdrop-blur-[35px]">
-            <h3 className="text-base font-semibold text-white font-sans leading-tight">{fullName}</h3>
-            <p className="text-sm text-gray-400/80 font-sans mt-1 truncate">{user.email}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation - Professional Menu Items */}
-      <div className="p-5 space-y-3 backdrop-blur-[40px]">
-        {navItems.map((item) => (
-          <button
-            key={item.label}
-            onClick={() => {
-              item.action();
-              setIsMobileMenuToggled(false);
-            }}
-            className="flex items-center gap-4 w-full p-4 rounded-xl 
-              text-gray-300 hover:text-white 
-              transition-all duration-200
-              bg-gradient-to-r from-gray-900/20 via-gray-900/15 to-transparent 
-              border border-gray-800/25 
-              hover:border-gray-700/35
-              hover:bg-gradient-to-r hover:from-gray-800/30 hover:via-gray-800/20 hover:to-transparent
-              backdrop-blur-[35px]
-              active:scale-[0.98]
-              shadow-lg shadow-black/25"
-          >
-            <div className="text-rose-400/85 backdrop-blur-[25px]">
-              {React.cloneElement(item.icon, { size: 22 })}
+      {/* Scrollable content area - Fixed height with proper scroll */}
+      <div className="flex-1 overflow-y-auto">
+        {/* User Info - Compact */}
+        <div className="border-b border-gray-800/50 p-4 bg-black/60">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full 
+              bg-gradient-to-r from-rose-500 to-pink-600
+              shadow-lg shadow-rose-900/30">
+              <span className="text-sm font-semibold text-white font-sans">
+                {user.firstName?.[0]}
+              </span>
             </div>
-            <span className="font-medium text-white/90 font-sans text-base">{item.label}</span>
-          </button>
-        ))}
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-medium text-white font-sans truncate">{fullName}</h3>
+              <p className="text-xs text-gray-400 font-sans truncate mt-0.5">{user.email}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Combined Navigation - Compact layout */}
+        <div className="p-4 space-y-2 pb-20"> {/* Added bottom padding for logout */}
+          {/* Main Navigation Items */}
+          {navItems.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => {
+                item.action();
+                setIsMobileMenuToggled(false);
+              }}
+              className="flex items-center gap-3 w-full p-3 rounded-lg 
+                text-gray-300 hover:text-white 
+                transition-all duration-200
+                bg-gray-900/50
+                border border-gray-800/50 
+                hover:border-rose-500/30
+                hover:bg-gradient-to-r hover:from-gray-800/50 hover:to-gray-900/50
+                active:scale-[0.98]"
+            >
+              <div className="text-rose-400">
+                {React.cloneElement(item.icon, { size: 18 })}
+              </div>
+              <span className="text-sm font-medium text-white/90 font-sans">{item.label}</span>
+            </button>
+          ))}
+
+          {/* Settings & Actions - Smaller buttons */}
+          <div className="pt-2 space-y-2">
+            {/* Theme Toggle */}
+            <button
+              onClick={() => {
+                dispatch(setMode());
+                setIsMobileMenuToggled(false);
+              }}
+              className="flex items-center gap-3 w-full p-3 rounded-lg 
+                text-gray-300 hover:text-white 
+                transition-all duration-200
+                bg-gray-900/50
+                border border-gray-800/50 
+                hover:border-amber-500/30
+                active:scale-[0.98]"
+            >
+              <div className="text-amber-400">
+                {document.documentElement.classList.contains("dark") ? (
+                  <Sun size={18} />
+                ) : (
+                  <Moon size={18} />
+                )}
+              </div>
+              <span className="text-sm font-medium text-white/90 font-sans">Theme</span>
+            </button>
+
+            {/* Settings */}
+            <button 
+              className="flex items-center gap-3 w-full p-3 rounded-lg 
+                text-gray-300 hover:text-white 
+                transition-all duration-200
+                bg-gray-900/50
+                border border-gray-800/50 
+                hover:border-blue-500/30
+                active:scale-[0.98]"
+            >
+              <div className="text-blue-400">
+                <Settings size={18} />
+              </div>
+              <span className="text-sm font-medium text-white/90 font-sans">Settings</span>
+            </button>
+
+            {/* Help & Support */}
+            <button 
+              className="flex items-center gap-3 w-full p-3 rounded-lg 
+                text-gray-300 hover:text-white 
+                transition-all duration-200
+                bg-gray-900/50
+                border border-gray-800/50 
+                hover:border-emerald-500/30
+                active:scale-[0.98]"
+            >
+              <div className="text-emerald-400">
+                <HelpCircle size={18} />
+              </div>
+              <span className="text-sm font-medium text-white/90 font-sans">Help</span>
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Actions - Professional Settings Items */}
-      <div className="p-5 space-y-3 border-t border-gray-800/25 backdrop-blur-[40px]">
-        <button
-          onClick={() => {
-            dispatch(setMode());
-            setIsMobileMenuToggled(false);
-          }}
-          className="flex items-center gap-4 w-full p-4 rounded-xl 
-            text-gray-300 hover:text-white 
-            transition-all duration-200
-            bg-gradient-to-r from-gray-900/20 via-gray-900/15 to-transparent 
-            border border-gray-800/25 
-            hover:border-gray-700/35
-            hover:bg-gradient-to-r hover:from-gray-800/30 hover:via-gray-800/20 hover:to-transparent
-            backdrop-blur-[35px]
-            active:scale-[0.98]
-            shadow-lg shadow-black/25"
-        >
-          <div className="text-rose-400/85 backdrop-blur-[25px]">
-            {document.documentElement.classList.contains("dark") ? (
-              <Sun size={22} />
-            ) : (
-              <Moon size={22} />
-            )}
-          </div>
-          <span className="font-medium text-white/90 font-sans text-base">Toggle Theme</span>
-        </button>
-
-        <button 
-          className="flex items-center gap-4 w-full p-4 rounded-xl 
-            text-gray-300 hover:text-white 
-            transition-all duration-200
-            bg-gradient-to-r from-gray-900/20 via-gray-900/15 to-transparent 
-            border border-gray-800/25 
-            hover:border-gray-700/35
-            hover:bg-gradient-to-r hover:from-gray-800/30 hover:via-gray-800/20 hover:to-transparent
-            backdrop-blur-[35px]
-            active:scale-[0.98]
-            shadow-lg shadow-black/25"
-        >
-          <div className="text-rose-400/85 backdrop-blur-[25px]">
-            <Settings size={22} />
-          </div>
-          <span className="font-medium text-white/90 font-sans text-base">Settings</span>
-        </button>
-
-        <button 
-          className="flex items-center gap-4 w-full p-4 rounded-xl 
-            text-gray-300 hover:text-white 
-            transition-all duration-200
-            bg-gradient-to-r from-gray-900/20 via-gray-900/15 to-transparent 
-            border border-gray-800/25 
-            hover:border-gray-700/35
-            hover:bg-gradient-to-r hover:from-gray-800/30 hover:via-gray-800/20 hover:to-transparent
-            backdrop-blur-[35px]
-            active:scale-[0.98]
-            shadow-lg shadow-black/25"
-        >
-          <div className="text-rose-400/85 backdrop-blur-[25px]">
-            <HelpCircle size={22} />
-          </div>
-          <span className="font-medium text-white/90 font-sans text-base">Help & Support</span>
-        </button>
-
+      {/* Fixed Logout Button at Bottom - Always Visible */}
+      <div className="border-t border-gray-800/50 p-4 bg-black/80 flex-shrink-0">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-4 w-full p-4 rounded-xl 
+          className="flex items-center justify-center gap-3 w-full p-3 rounded-lg 
             text-red-400 hover:text-red-300 
             transition-all duration-200
-            bg-gradient-to-r from-red-900/10 via-red-900/8 to-transparent 
-            border border-red-800/20 
-            hover:border-red-700/30
-            hover:bg-gradient-to-r hover:from-red-800/20 hover:via-red-800/12 hover:to-transparent
-            backdrop-blur-[35px]
-            active:scale-[0.98]
-            shadow-lg shadow-black/25"
+            bg-gradient-to-r from-red-900/20 to-red-900/10
+            border border-red-800/50 
+            hover:border-red-600
+            hover:bg-gradient-to-r hover:from-red-900/30 hover:to-red-900/20
+            active:scale-[0.98]"
         >
-          <div className="text-red-400/85 backdrop-blur-[25px]">
-            <LogOut size={22} />
+          <div className="text-red-400">
+            <LogOut size={18} />
           </div>
-          <span className="font-medium text-red-300/90 font-sans text-base">Logout</span>
+          <span className="text-sm font-medium text-red-300 font-sans">Logout</span>
         </button>
       </div>
     </div>

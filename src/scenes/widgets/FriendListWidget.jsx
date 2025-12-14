@@ -137,57 +137,59 @@ const FriendListWidget = ({ userId }) => {
   const renderFriendItem = (friend) => (
     <div
       key={friend._id}
-      className="group p-3 rounded-xl border border-gray-800 hover:border-gray-700 bg-gradient-to-r from-gray-900/40 to-black/40 hover:from-gray-800/40 hover:to-gray-900/40 transition-all duration-300 cursor-pointer"
+      className="group p-3 sm:p-4 rounded-lg sm:rounded-xl border border-gray-800 hover:border-gray-700 bg-gradient-to-r from-gray-900/40 to-black/40 hover:from-gray-800/40 hover:to-gray-900/40 transition-all duration-300 cursor-pointer active:scale-[0.98]"
       onClick={() => handleViewProfile(friend._id)}
     >
-      <div className="flex items-center gap-3">
-        {/* Avatar */}
-        <div className="relative">
-          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-rose-500/20 to-red-500/20 flex items-center justify-center">
-            <div className="h-10 w-10 rounded-xl bg-gray-800 flex items-center justify-center text-white font-semibold">
+      <div className="flex items-center gap-3 sm:gap-4">
+        {/* Avatar - Responsive sizing */}
+        <div className="relative flex-shrink-0">
+          <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-rose-500/20 to-red-500/20 flex items-center justify-center">
+            <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg sm:rounded-xl bg-gray-800 flex items-center justify-center text-white font-semibold text-sm sm:text-base">
               {friend.firstName?.[0]}
               {friend.lastName?.[0]}
             </div>
           </div>
-          <div className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-gray-900 ${
+          <div className={`absolute -bottom-1 -right-1 h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full border-2 border-gray-900 ${
             friend.isOnline ? "bg-green-500" : "bg-gray-500"
           }`}></div>
         </div>
 
-        {/* Friend Info */}
+        {/* Friend Info - Responsive text sizing */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
-            <div>
-              <h4 className="font-semibold text-white truncate">
+            <div className="flex-1 min-w-0 pr-2">
+              <h4 className="font-semibold text-white truncate text-sm sm:text-base">
                 {friend.firstName} {friend.lastName}
               </h4>
-              <p className="text-xs text-gray-400 truncate">{friend.occupation}</p>
+              <p className="text-xs sm:text-sm text-gray-400 truncate mt-0.5">
+                {friend.occupation}
+              </p>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 sm:gap-1.5">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleFriendAction("message", friend._id);
                 }}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-rose-400 hover:bg-gray-800/50 transition-colors"
+                className="p-1.5 rounded-lg text-gray-400 hover:text-rose-400 hover:bg-gray-800/50 transition-colors active:scale-90"
               >
-                <MessageCircle size={16} />
+                <MessageCircle size={14} className="sm:w-4 sm:h-4" />
               </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleFriendAction("more", friend._id);
                 }}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 transition-colors"
+                className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/50 transition-colors active:scale-90"
               >
-                <MoreVertical size={16} />
+                <MoreVertical size={14} className="sm:w-4 sm:h-4" />
               </button>
             </div>
           </div>
           
-          {/* Status */}
+          {/* Status - Responsive sizing */}
           <div className="flex items-center gap-2 mt-2">
-            <div className={`text-xs px-2 py-0.5 rounded-full ${
+            <div className={`text-[10px] sm:text-xs px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full ${
               friend.isOnline 
                 ? "bg-green-500/10 text-green-400 border border-green-500/20"
                 : "bg-gray-800/50 text-gray-400 border border-gray-700/50"
@@ -201,75 +203,75 @@ const FriendListWidget = ({ userId }) => {
   );
 
   return (
-    <div className="rounded-2xl border border-gray-800/50 bg-gradient-to-b from-gray-900/40 to-black/40 backdrop-blur-sm p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-r from-rose-500/20 to-red-500/20 flex items-center justify-center">
-            <Users size={20} className="text-rose-400" />
+    <div className="rounded-xl sm:rounded-2xl border border-gray-800/50 bg-gradient-to-b from-gray-900/40 to-black/40 backdrop-blur-sm p-4 sm:p-6">
+      {/* Header - Responsive */}
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg sm:rounded-xl bg-gradient-to-r from-rose-500/20 to-red-500/20 flex items-center justify-center flex-shrink-0">
+            <Users size={16} className="sm:w-5 sm:h-5 text-rose-400" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-white">Your Circle</h2>
-            <p className="text-sm text-gray-400">People you connect with</p>
+            <h2 className="text-base sm:text-lg font-semibold text-white">Your Circle</h2>
+            <p className="text-xs sm:text-sm text-gray-400">People you connect with</p>
           </div>
         </div>
-        <button className="p-2 rounded-lg border border-gray-800 bg-gray-900/50 text-gray-400 hover:text-rose-400 hover:border-gray-700 transition-colors">
-          <UserPlus size={18} />
+        <button className="p-1.5 sm:p-2 rounded-lg border border-gray-800 bg-gray-900/50 text-gray-400 hover:text-rose-400 hover:border-gray-700 transition-colors active:scale-90">
+          <UserPlus size={14} className="sm:w-4 sm:h-4" />
         </button>
       </div>
 
-      {/* Search */}
-      <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+      {/* Search - Responsive */}
+      <div className="relative mb-4 sm:mb-6">
+        <Search className="absolute left-3 top-1/2 h-3 w-3 sm:h-4 sm:w-4 -translate-y-1/2 text-gray-500" />
         <input
           type="text"
           placeholder="Search friends..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full rounded-xl border border-gray-800 bg-gray-900/50 py-2.5 pl-10 pr-4 text-sm text-white placeholder-gray-500 focus:border-rose-500/50 focus:outline-none focus:ring-1 focus:ring-rose-500/30"
+          className="w-full rounded-lg sm:rounded-xl border border-gray-800 bg-gray-900/50 py-2 sm:py-2.5 pl-8 sm:pl-10 pr-3 sm:pr-4 text-xs sm:text-sm text-white placeholder-gray-500 focus:border-rose-500/50 focus:outline-none focus:ring-1 focus:ring-rose-500/30"
         />
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="p-3 rounded-xl bg-gradient-to-br from-rose-500/10 to-red-500/10 border border-rose-500/20">
-          <div className="text-2xl font-bold text-white">{friends.length}</div>
-          <div className="text-xs text-gray-400">Total</div>
+      {/* Stats - Responsive grid */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6">
+        <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-gradient-to-br from-rose-500/10 to-red-500/10 border border-rose-500/20">
+          <div className="text-lg sm:text-2xl font-bold text-white">{friends.length}</div>
+          <div className="text-[10px] sm:text-xs text-gray-400">Total</div>
         </div>
-        <div className="p-3 rounded-xl bg-gray-900/30 border border-gray-800">
-          <div className="text-2xl font-bold text-white">
+        <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-gray-900/30 border border-gray-800">
+          <div className="text-lg sm:text-2xl font-bold text-white">
             {friends.filter(f => f.isOnline).length}
           </div>
-          <div className="text-xs text-gray-400">Online</div>
+          <div className="text-[10px] sm:text-xs text-gray-400">Online</div>
         </div>
-        <div className="p-3 rounded-xl bg-gray-900/30 border border-gray-800">
-          <div className="text-2xl font-bold text-white">
+        <div className="p-2 sm:p-3 rounded-lg sm:rounded-xl bg-gray-900/30 border border-gray-800">
+          <div className="text-lg sm:text-2xl font-bold text-white">
             {friends.filter(f => !f.isOnline).length}
           </div>
-          <div className="text-xs text-gray-400">Offline</div>
+          <div className="text-[10px] sm:text-xs text-gray-400">Offline</div>
         </div>
       </div>
 
       {/* Friend List */}
-      <div className="space-y-2">
+      <div className="space-y-1.5 sm:space-y-2">
         {loading ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-rose-400" />
-            <span className="ml-2 text-gray-400">Loading friends...</span>
+          <div className="flex items-center justify-center py-6 sm:py-8">
+            <Loader2 className="h-5 w-5 sm:h-6 sm:w-6 animate-spin text-rose-400" />
+            <span className="ml-2 text-xs sm:text-sm text-gray-400">Loading friends...</span>
           </div>
         ) : filteredFriends.length > 0 ? (
           <>
             {/* Online Friends */}
             {filteredFriends.some(f => f.isOnline) && (
-              <div className="mb-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                  <h3 className="text-sm font-medium text-gray-300">Online Now</h3>
-                  <span className="text-xs text-gray-500 ml-auto">
+              <div className="mb-3 sm:mb-4">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+                  <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-green-500 flex-shrink-0"></div>
+                  <h3 className="text-xs sm:text-sm font-medium text-gray-300">Online Now</h3>
+                  <span className="text-[10px] sm:text-xs text-gray-500 ml-auto flex-shrink-0">
                     {filteredFriends.filter(f => f.isOnline).length}
                   </span>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   {filteredFriends
                     .filter(friend => friend.isOnline)
                     .map(renderFriendItem)}
@@ -280,14 +282,14 @@ const FriendListWidget = ({ userId }) => {
             {/* Offline Friends */}
             {filteredFriends.some(f => !f.isOnline) && (
               <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="h-2 w-2 rounded-full bg-gray-500"></div>
-                  <h3 className="text-sm font-medium text-gray-300">Recently Active</h3>
-                  <span className="text-xs text-gray-500 ml-auto">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+                  <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-gray-500 flex-shrink-0"></div>
+                  <h3 className="text-xs sm:text-sm font-medium text-gray-300">Recently Active</h3>
+                  <span className="text-[10px] sm:text-xs text-gray-500 ml-auto flex-shrink-0">
                     {filteredFriends.filter(f => !f.isOnline).length}
                   </span>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   {filteredFriends
                     .filter(friend => !friend.isOnline)
                     .map(renderFriendItem)}
@@ -296,32 +298,32 @@ const FriendListWidget = ({ userId }) => {
             )}
           </>
         ) : searchQuery ? (
-          <div className="text-center py-8">
-            <UserX className="h-12 w-12 text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-400">No friends match your search</p>
-            <p className="text-sm text-gray-500 mt-1">Try a different name</p>
+          <div className="text-center py-6 sm:py-8">
+            <UserX className="h-8 w-8 sm:h-12 sm:w-12 text-gray-600 mx-auto mb-2 sm:mb-3" />
+            <p className="text-sm sm:text-base text-gray-400">No friends match your search</p>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">Try a different name</p>
           </div>
         ) : (
-          <div className="text-center py-8">
-            <UserPlus className="h-12 w-12 text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-400">Your circle is empty</p>
-            <p className="text-sm text-gray-500 mt-1">Start adding friends to connect</p>
-            <button className="mt-4 px-4 py-2 bg-gradient-to-r from-rose-500 to-red-600 rounded-lg text-white text-sm font-medium hover:shadow-lg hover:shadow-red-500/25 transition-all">
+          <div className="text-center py-6 sm:py-8">
+            <UserPlus className="h-8 w-8 sm:h-12 sm:w-12 text-gray-600 mx-auto mb-2 sm:mb-3" />
+            <p className="text-sm sm:text-base text-gray-400">Your circle is empty</p>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">Start adding friends to connect</p>
+            <button className="mt-3 sm:mt-4 px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-rose-500 to-red-600 rounded-lg text-white text-xs sm:text-sm font-medium hover:shadow-lg hover:shadow-red-500/25 transition-all active:scale-95">
               Find Friends
             </button>
           </div>
         )}
       </div>
 
-      {/* Footer Actions */}
+      {/* Footer Actions - Responsive */}
       {filteredFriends.length > 0 && (
-        <div className="mt-6 pt-4 border-t border-gray-800/50">
+        <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-800/50">
           <div className="flex items-center justify-between">
-            <button className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
-              <UserCheck size={16} />
+            <button className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">
+              <UserCheck size={12} className="sm:w-4 sm:h-4" />
               <span>Friend Requests</span>
             </button>
-            <button className="text-sm text-rose-400 hover:text-rose-300 transition-colors">
+            <button className="text-xs sm:text-sm text-rose-400 hover:text-rose-300 transition-colors">
               View All
             </button>
           </div>
