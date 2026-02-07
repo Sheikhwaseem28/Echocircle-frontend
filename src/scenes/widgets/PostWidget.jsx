@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Friend from "../../components/Friend";
 import { setPost } from "../../state/index";
+import { API_URL } from "../../api";
 import {
   Heart,
   MessageCircle,
@@ -33,9 +34,6 @@ const PostWidget = ({
   const [isCommentsVisible, setIsCommentsVisible] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [isLiked, setIsLiked] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [showActions, setShowActions] = useState(false);
-  const [showShareOptions, setShowShareOptions] = useState(false);
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user._id);
@@ -44,10 +42,10 @@ const PostWidget = ({
   const handleLike = async () => {
     const newLikedState = !isLiked;
     setIsLiked(newLikedState);
-    
+
     try {
       const response = await fetch(
-        `https://echocircle-backend.vercel.app/posts/${postId}/like`,
+        `${API_URL}/posts/${postId}/like`,
         {
           method: "PATCH",
           headers: {
@@ -81,11 +79,6 @@ const PostWidget = ({
     }
   };
 
-  const handleShare = (platform) => {
-    console.log(`Sharing to ${platform}`);
-    setShowShareOptions(false);
-  };
-
   const getAudienceIcon = () => {
     switch (audience) {
       case "private":
@@ -107,13 +100,6 @@ const PostWidget = ({
         return "Public";
     }
   };
-
-  const shareOptions = [
-    { platform: "copy", label: "Copy Link", icon: "🔗" },
-    { platform: "message", label: "Send in Message", icon: "💬" },
-    { platform: "twitter", label: "Share on Twitter", icon: "🐦" },
-    { platform: "facebook", label: "Share on Facebook", icon: "📘" },
-  ];
 
   const formatCount = (count) => {
     if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
@@ -149,37 +135,7 @@ const PostWidget = ({
               </div>
             </div>
           </div>
-          
-          <div className="relative">
-            <button
-              onClick={() => setShowActions(!showActions)}
-              className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/30 transition-colors"
-            >
-              <MoreVertical size={20} />
-            </button>
-            
-            {showActions && (
-              <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setShowActions(false)}
-                />
-                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-gray-800 bg-gray-900/95 backdrop-blur-xl shadow-2xl z-50">
-                  <button className="flex items-center gap-3 w-full p-3 text-sm text-gray-300 hover:bg-gray-800/50 hover:text-white transition-colors rounded-t-xl">
-                    <Bookmark size={16} />
-                    {isBookmarked ? "Remove bookmark" : "Save post"}
-                  </button>
-                  <button className="flex items-center gap-3 w-full p-3 text-sm text-gray-300 hover:bg-gray-800/50 hover:text-white transition-colors">
-                    <ExternalLink size={16} />
-                    Open in new tab
-                  </button>
-                  <button className="flex items-center gap-3 w-full p-3 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors rounded-b-xl">
-                    Report post
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+
         </div>
       </div>
 
@@ -244,11 +200,10 @@ const PostWidget = ({
       <div className="flex items-center border-y border-gray-800/50 py-2 mb-4">
         <button
           onClick={handleLike}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg transition-all ${
-            isLiked
-              ? "text-rose-400 hover:text-rose-300"
-              : "text-gray-400 hover:text-white hover:bg-gray-800/30"
-          }`}
+          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg transition-all ${isLiked
+            ? "text-rose-400 hover:text-rose-300"
+            : "text-gray-400 hover:text-white hover:bg-gray-800/30"
+            }`}
         >
           {isLiked ? (
             <Heart size={20} className="text-rose-400" />
@@ -260,58 +215,13 @@ const PostWidget = ({
 
         <button
           onClick={() => setIsCommentsVisible(!isCommentsVisible)}
-          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg transition-all ${
-            isCommentsVisible
-              ? "text-blue-400 hover:text-blue-300"
-              : "text-gray-400 hover:text-white hover:bg-gray-800/30"
-          }`}
+          className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg transition-all ${isCommentsVisible
+            ? "text-blue-400 hover:text-blue-300"
+            : "text-gray-400 hover:text-white hover:bg-gray-800/30"
+            }`}
         >
           <MessageCircle size={20} />
           <span className="text-sm font-medium">Comment</span>
-        </button>
-
-        <div className="relative flex-1">
-          <button
-            onClick={() => setShowShareOptions(!showShareOptions)}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/30 transition-all"
-          >
-            <Share2 size={20} />
-            <span className="text-sm font-medium">Share</span>
-          </button>
-          
-          {showShareOptions && (
-            <>
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setShowShareOptions(false)}
-              />
-              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-56 rounded-xl border border-gray-800 bg-gray-900/95 backdrop-blur-xl shadow-2xl z-50">
-                <div className="p-3 border-b border-gray-800">
-                  <h4 className="text-sm font-medium text-white">Share this post</h4>
-                </div>
-                <div className="p-2">
-                  {shareOptions.map((option) => (
-                    <button
-                      key={option.platform}
-                      onClick={() => handleShare(option.platform)}
-                      className="flex items-center gap-3 w-full p-3 rounded-lg text-sm text-gray-300 hover:bg-gray-800/50 hover:text-white transition-colors"
-                    >
-                      <span>{option.icon}</span>
-                      <span>{option.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-
-        <button
-          onClick={() => setIsBookmarked(!isBookmarked)}
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800/30 transition-all"
-        >
-          <Bookmark size={20} className={isBookmarked ? "fill-current text-amber-400" : ""} />
-          <span className="text-sm font-medium">Save</span>
         </button>
       </div>
 
@@ -372,11 +282,10 @@ const PostWidget = ({
             <button
               type="submit"
               disabled={!newComment.trim()}
-              className={`px-4 rounded-xl ${
-                newComment.trim()
-                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:shadow-lg hover:shadow-blue-500/25"
-                  : "bg-gray-800 text-gray-500 cursor-not-allowed"
-              }`}
+              className={`px-4 rounded-xl ${newComment.trim()
+                ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:shadow-lg hover:shadow-blue-500/25"
+                : "bg-gray-800 text-gray-500 cursor-not-allowed"
+                }`}
             >
               <Send size={20} />
             </button>
@@ -388,151 +297,3 @@ const PostWidget = ({
 };
 
 export default PostWidget;
-
-
-
-// import {
-//   ChatBubbleOutlineOutlined,
-//   FavoriteBorderOutlined,
-//   FavoriteOutlined,
-//   ShareOutlined,
-// } from "@mui/icons-material";
-// import { Box, Divider, IconButton, Typography, useTheme } from "@mui/material";
-// import FlexBetween from "../../components/FlexBetween";
-// import Friend from "../../components/Friend";
-// import WidgetWrapper from "../../components/WidgetWrapper";
-// import { useState } from "react";
-// import { useDispatch, useSelector } from "react-redux";
-// import { setPost } from "../../state/index";
-
-// const PostWidget = ({
-//   postId,
-//   postUserId,
-//   name,
-//   description,
-//   location,
-//   picturePath,
-//   userPicturePath,
-//   likes = {}, 
-//   comments = [], 
-// }) => {
-//   const [isCommentsVisible, setIsCommentsVisible] = useState(false);
-//   const dispatch = useDispatch();
-//   const token = useSelector((state) => state.token);
-//   const loggedInUserId = useSelector((state) => state.user._id);
-//   const isLiked = Boolean(likes[loggedInUserId]);
-//   const likeCount = Object.keys(likes).length;
-
-//   const { palette } = useTheme();
-//   const mainColor = palette.neutral.main;
-//   const primaryColor = palette.primary.main;
-
-//   const handleLike = async () => {
-//     try {
-//       const response = await fetch(`https://echocircle-backend.vercel.app/posts/${postId}/like`, {
-//         method: "PATCH",
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({ userId: loggedInUserId }),
-//       });
-
-//       if (response.ok) {
-//         const updatedPost = await response.json();
-//         dispatch(setPost({ post: updatedPost }));
-//       } else {
-//         console.error("Failed to like post");
-//       }
-//     } catch (error) {
-//       console.error("Error liking post:", error);
-//     }
-//   };
-
-//   return (
-//     <WidgetWrapper m="2rem 0">
-//       <Friend
-//         friendId={postUserId}
-//         name={name}
-//         subtitle={location}
-//         userPicturePath={userPicturePath}
-//       />
-//       <Typography color={mainColor} sx={{ mt: "1rem" }}>
-//         {description}
-//       </Typography>
-//       {picturePath && (
-//         <Box
-//           sx={{
-//             borderRadius: "0.75rem",
-//             marginTop: "0.75rem",
-//             width: "100%",
-//             height: "300px",
-//             backgroundColor: palette.neutral.light,
-//             display: "flex",
-//             alignItems: "center",
-//             justifyContent: "center",
-//             overflow: "hidden"
-//           }}
-//         >
-//           {/* Simple image display or placeholder */}
-//           {picturePath.startsWith('http') || picturePath.startsWith('data:image') ? (
-//             <img
-//               src={picturePath}
-//               alt="post"
-//               style={{ 
-//                 width: "100%", 
-//                 height: "100%", 
-//                 objectFit: "cover" 
-//               }}
-//               onError={(e) => {
-//                 e.target.onerror = null;
-//                 e.target.style.display = 'none';
-//                 e.target.parentElement.innerHTML = '<Typography color="textSecondary">Image not available</Typography>';
-//               }}
-//             />
-//           ) : (
-//             <Typography color="textSecondary">Image preview</Typography>
-//           )}
-//         </Box>
-//       )}
-//       <FlexBetween mt="0.25rem">
-//         <FlexBetween gap="1rem">
-//           <FlexBetween gap="0.3rem">
-//             <IconButton onClick={handleLike} aria-label="like post">
-//               {isLiked ? (
-//                 <FavoriteOutlined sx={{ color: primaryColor }} />
-//               ) : (
-//                 <FavoriteBorderOutlined />
-//               )}
-//             </IconButton>
-//             <Typography>{likeCount}</Typography>
-//           </FlexBetween>
-//           <FlexBetween gap="0.3rem">
-//             <IconButton onClick={() => setIsCommentsVisible(!isCommentsVisible)} aria-label="toggle comments">
-//               <ChatBubbleOutlineOutlined />
-//             </IconButton>
-//             <Typography>{comments.length}</Typography>
-//           </FlexBetween>
-//         </FlexBetween>
-//         <IconButton aria-label="share post">
-//           <ShareOutlined />
-//         </IconButton>
-//       </FlexBetween>
-//       {isCommentsVisible && (
-//         <Box mt="0.5rem">
-//           {comments.map((comment, index) => (
-//             <Box key={`${name}-${index}`}>
-//               <Divider />
-//               <Typography sx={{ color: mainColor, m: "0.5rem 0", pl: "1rem" }}>
-//                 {comment}
-//               </Typography>
-//             </Box>
-//           ))}
-//           <Divider />
-//         </Box>
-//       )}
-//     </WidgetWrapper>
-//   );
-// };
-
-// export default PostWidget;

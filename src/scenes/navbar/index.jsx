@@ -1,30 +1,24 @@
-import  { useState } from "react";
+import { useState } from "react";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setMode, setLogout } from "../../state/index";
 import { useNavigate } from "react-router-dom";
 import {
   Search,
-  MessageCircle,
   Moon,
   Sun,
-  Bell,
-  HelpCircle,
   Menu,
   X,
   Home,
   User,
-  Users,
-  Settings,
   LogOut,
   ChevronDown,
-  Sparkles,
 } from "lucide-react";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
@@ -38,24 +32,14 @@ const Navbar = () => {
   const navItems = [
     { icon: <Home size={20} />, label: "Home", action: () => navigate("/home") },
     { icon: <User size={20} />, label: "Profile", action: () => navigate(`/profile/${user._id}`) },
-    { icon: <Users size={20} />, label: "Circles", action: () => navigate("/circles") },
-    { icon: <Sparkles size={20} />, label: "Discover", action: () => navigate("/discover") },
   ];
 
   const userMenuItems = [
     { icon: <User size={18} />, label: "My Profile", action: () => navigate(`/profile/${user._id}`) },
-    { icon: <Settings size={18} />, label: "Settings", action: () => navigate("/settings") },
-    { icon: <HelpCircle size={18} />, label: "Help & Support", action: () => {} },
     { icon: <LogOut size={18} />, label: "Logout", action: handleLogout, danger: true },
   ];
 
-  const notifications = [
-    { id: 1, text: "John liked your post", time: "2m ago", read: false },
-    { id: 2, text: "Sarah added you to a circle", time: "1h ago", read: false },
-    { id: 3, text: "New feature available", time: "3h ago", read: true },
-  ];
 
-  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-800/50 bg-black/80 backdrop-blur-xl">
@@ -120,61 +104,6 @@ const Navbar = () => {
                 )}
               </button>
 
-              {/* Messages */}
-              <button className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-gray-800 bg-gray-900/50 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all">
-                <MessageCircle size={18} />
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 text-[10px] font-bold text-white flex items-center justify-center">
-                  3
-                </span>
-              </button>
-
-              {/* Notifications */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-gray-800 bg-gray-900/50 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all"
-                >
-                  <Bell size={18} />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-rose-500 text-[10px] font-bold text-white flex items-center justify-center">
-                      {unreadCount}
-                    </span>
-                  )}
-                </button>
-
-                {/* Notifications Dropdown */}
-                {showNotifications && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setShowNotifications(false)}
-                    />
-                    <div className="absolute right-0 mt-2 w-80 rounded-xl border border-gray-800 bg-gray-900/95 backdrop-blur-xl shadow-2xl z-50">
-                      <div className="p-4 border-b border-gray-800">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-semibold text-white">Notifications</h3>
-                          <button className="text-sm text-rose-400 hover:text-rose-300">
-                            Mark all as read
-                          </button>
-                        </div>
-                      </div>
-                      <div className="max-h-96 overflow-y-auto">
-                        {notifications.map((notification) => (
-                          <div
-                            key={notification.id}
-                            className={`p-4 border-b border-gray-800/50 hover:bg-gray-800/30 cursor-pointer ${
-                              !notification.read ? "bg-rose-500/5" : ""
-                            }`}
-                          >
-                            <p className="text-sm text-gray-100">{notification.text}</p>
-                            <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
 
               {/* User Menu */}
               <div className="relative">
@@ -219,11 +148,10 @@ const Navbar = () => {
                               item.action();
                               setShowUserMenu(false);
                             }}
-                            className={`flex items-center gap-3 w-full p-3 rounded-lg text-sm transition-all ${
-                              item.danger
-                                ? "text-red-400 hover:bg-red-500/10 hover:text-red-300"
-                                : "text-gray-300 hover:bg-gray-800/50 hover:text-white"
-                            }`}
+                            className={`flex items-center gap-3 w-full p-3 rounded-lg text-sm transition-all ${item.danger
+                              ? "text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                              : "text-gray-300 hover:bg-gray-800/50 hover:text-white"
+                              }`}
                           >
                             {item.icon}
                             {item.label}
@@ -259,42 +187,42 @@ const Navbar = () => {
         </div>
       </div>
 
-{/* Mobile Menu - Optimized for Mobile */}
-{isMobileMenuToggled && (
-  <div className="fixed inset-0 z-50 md:hidden">
-    {/* Backdrop with smooth fade */}
-    <div
-      className="absolute inset-0 bg-black/80 transition-opacity duration-300 animate-fadeIn"
-      onClick={() => setIsMobileMenuToggled(false)}
-    />
+      {/* Mobile Menu - Optimized for Mobile */}
+      {isMobileMenuToggled && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          {/* Backdrop with smooth fade */}
+          <div
+            className="absolute inset-0 bg-black/80 transition-opacity duration-300 animate-fadeIn"
+            onClick={() => setIsMobileMenuToggled(false)}
+          />
 
-    {/* Main Menu Container - Slide in animation */}
-    <div className="absolute right-0 top-0 h-[65vh] w-full max-w-xs
+          {/* Main Menu Container - Slide in animation */}
+          <div className="absolute right-0 top-0 h-[65vh] w-full max-w-xs
       bg-gradient-to-b from-gray-950 via-black to-gray-950
       border-x border-gray-800/50
       shadow-2xl shadow-black/50
       animate-slideInRight
       flex flex-col">
-      
-      {/* Header - Compact design */}
-      <div className="border-b border-gray-800/50 p-4 bg-black/80 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg 
+
+            {/* Header - Compact design */}
+            <div className="border-b border-gray-800/50 p-4 bg-black/80 flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg 
               bg-gradient-to-br from-rose-500 to-pink-600
               shadow-lg shadow-rose-900/30">
-              <span className="text-xs font-bold text-white">
-                EC
-              </span>
-            </div>
-            <div>
-              <h2 className="text-sm font-semibold text-white font-sans">Menu</h2>
-              <p className="text-[10px] text-gray-400 font-sans tracking-wider">EchoCircle</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setIsMobileMenuToggled(false)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg 
+                    <span className="text-xs font-bold text-white">
+                      EC
+                    </span>
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-semibold text-white font-sans">Menu</h2>
+                    <p className="text-[10px] text-gray-400 font-sans tracking-wider">EchoCircle</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsMobileMenuToggled(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg 
               border border-gray-800 
               bg-gray-900/80 
               text-gray-400 
@@ -302,42 +230,42 @@ const Navbar = () => {
               hover:bg-gray-800
               hover:border-gray-700
               transition-all duration-200"
-          >
-            <X size={18} />
-          </button>
-        </div>
-      </div>
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
 
-      {/* Scrollable content area - Fixed height with proper scroll */}
-      <div className="flex-1 overflow-y-auto">
-        {/* User Info - Compact */}
-        <div className="border-b border-gray-800/50 p-4 bg-black/60">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full 
+            {/* Scrollable content area - Fixed height with proper scroll */}
+            <div className="flex-1 overflow-y-auto">
+              {/* User Info - Compact */}
+              <div className="border-b border-gray-800/50 p-4 bg-black/60">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full 
               bg-gradient-to-r from-rose-500 to-pink-600
               shadow-lg shadow-rose-900/30">
-              <span className="text-sm font-semibold text-white font-sans">
-                {user.firstName?.[0]}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-medium text-white font-sans truncate">{fullName}</h3>
-              <p className="text-xs text-gray-400 font-sans truncate mt-0.5">{user.email}</p>
-            </div>
-          </div>
-        </div>
+                    <span className="text-sm font-semibold text-white font-sans">
+                      {user.firstName?.[0]}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-medium text-white font-sans truncate">{fullName}</h3>
+                    <p className="text-xs text-gray-400 font-sans truncate mt-0.5">{user.email}</p>
+                  </div>
+                </div>
+              </div>
 
-        {/* Combined Navigation - Compact layout */}
-        <div className="p-4 space-y-2 pb-20"> {/* Added bottom padding for logout */}
-          {/* Main Navigation Items */}
-          {navItems.map((item) => (
-            <button
-              key={item.label}
-              onClick={() => {
-                item.action();
-                setIsMobileMenuToggled(false);
-              }}
-              className="flex items-center gap-3 w-full p-3 rounded-lg 
+              {/* Combined Navigation - Compact layout */}
+              <div className="p-4 space-y-2 pb-20"> {/* Added bottom padding for logout */}
+                {/* Main Navigation Items */}
+                {navItems.map((item) => (
+                  <button
+                    key={item.label}
+                    onClick={() => {
+                      item.action();
+                      setIsMobileMenuToggled(false);
+                    }}
+                    className="flex items-center gap-3 w-full p-3 rounded-lg 
                 text-gray-300 hover:text-white 
                 transition-all duration-200
                 bg-gray-900/50
@@ -345,80 +273,50 @@ const Navbar = () => {
                 hover:border-rose-500/30
                 hover:bg-gradient-to-r hover:from-gray-800/50 hover:to-gray-900/50
                 active:scale-[0.98]"
-            >
-              <div className="text-rose-400">
-                {React.cloneElement(item.icon, { size: 18 })}
-              </div>
-              <span className="text-sm font-medium text-white/90 font-sans">{item.label}</span>
-            </button>
-          ))}
+                  >
+                    <div className="text-rose-400">
+                      {React.cloneElement(item.icon, { size: 18 })}
+                    </div>
+                    <span className="text-sm font-medium text-white/90 font-sans">{item.label}</span>
+                  </button>
+                ))}
 
-          {/* Settings & Actions - Smaller buttons */}
-          <div className="pt-2 space-y-2">
-            {/* Theme Toggle */}
-            <button
-              onClick={() => {
-                dispatch(setMode());
-                setIsMobileMenuToggled(false);
-              }}
-              className="flex items-center gap-3 w-full p-3 rounded-lg 
+                {/* Settings & Actions - Smaller buttons */}
+                <div className="pt-2 space-y-2">
+                  {/* Theme Toggle */}
+                  <button
+                    onClick={() => {
+                      dispatch(setMode());
+                      setIsMobileMenuToggled(false);
+                    }}
+                    className="flex items-center gap-3 w-full p-3 rounded-lg 
                 text-gray-300 hover:text-white 
                 transition-all duration-200
                 bg-gray-900/50
                 border border-gray-800/50 
                 hover:border-amber-500/30
                 active:scale-[0.98]"
-            >
-              <div className="text-amber-400">
-                {document.documentElement.classList.contains("dark") ? (
-                  <Sun size={18} />
-                ) : (
-                  <Moon size={18} />
-                )}
-              </div>
-              <span className="text-sm font-medium text-white/90 font-sans">Theme</span>
-            </button>
+                  >
+                    <div className="text-amber-400">
+                      {document.documentElement.classList.contains("dark") ? (
+                        <Sun size={18} />
+                      ) : (
+                        <Moon size={18} />
+                      )}
+                    </div>
+                    <span className="text-sm font-medium text-white/90 font-sans">Theme</span>
+                  </button>
 
-            {/* Settings */}
-            <button 
-              className="flex items-center gap-3 w-full p-3 rounded-lg 
-                text-gray-300 hover:text-white 
-                transition-all duration-200
-                bg-gray-900/50
-                border border-gray-800/50 
-                hover:border-blue-500/30
-                active:scale-[0.98]"
-            >
-              <div className="text-blue-400">
-                <Settings size={18} />
-              </div>
-              <span className="text-sm font-medium text-white/90 font-sans">Settings</span>
-            </button>
 
-            {/* Help & Support */}
-            <button 
-              className="flex items-center gap-3 w-full p-3 rounded-lg 
-                text-gray-300 hover:text-white 
-                transition-all duration-200
-                bg-gray-900/50
-                border border-gray-800/50 
-                hover:border-emerald-500/30
-                active:scale-[0.98]"
-            >
-              <div className="text-emerald-400">
-                <HelpCircle size={18} />
+                </div>
               </div>
-              <span className="text-sm font-medium text-white/90 font-sans">Help</span>
-            </button>
-          </div>
-        </div>
-      </div>
+            </div>
 
-      {/* Fixed Logout Button at Bottom - Always Visible */}
-      <div className="border-t border-gray-800/50 p-4 bg-black/80 flex-shrink-0">
-        <button
-          onClick={handleLogout}
-          className="flex items-center justify-center gap-3 w-full p-3 rounded-lg 
+            {/* Fixed Logout Button at Bottom - Always Visible */}
+            <div className="border-t border-gray-800/50 p-4 bg-black/80 flex-shrink-0">
+              <button
+                onClick={handleLogout}
+                className="flex items-center justify-center gap-3 w-full p-3 rounded-lg 
             text-red-400 hover:text-red-300 
             transition-all duration-200
             bg-gradient-to-r from-red-900/20 to-red-900/10
@@ -426,16 +324,16 @@ const Navbar = () => {
             hover:border-red-600
             hover:bg-gradient-to-r hover:from-red-900/30 hover:to-red-900/20
             active:scale-[0.98]"
-        >
-          <div className="text-red-400">
-            <LogOut size={18} />
+              >
+                <div className="text-red-400">
+                  <LogOut size={18} />
+                </div>
+                <span className="text-sm font-medium text-red-300 font-sans">Logout</span>
+              </button>
+            </div>
           </div>
-          <span className="text-sm font-medium text-red-300 font-sans">Logout</span>
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+        </div>
+      )}
     </header>
   );
 };

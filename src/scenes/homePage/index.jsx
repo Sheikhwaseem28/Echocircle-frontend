@@ -5,7 +5,6 @@ import Navbar from "../../scenes/navbar";
 import UserWidget from "../../scenes/widgets/UserWidget";
 import MyPostWidget from "../../scenes/widgets/MyPostWidget";
 import PostsWidget from "../../scenes/widgets/PostsWidget";
-import AdvertWidget from "../../scenes/widgets/AdvertWidget";
 import FriendListWidget from "../../scenes/widgets/FriendListWidget";
 import { Home, User, Users, Bell, Search, Plus, MessageSquare, Sparkles } from "lucide-react";
 
@@ -15,10 +14,10 @@ const HomePage = () => {
   const [activeTab, setActiveTab] = useState("home");
 
   const quickActions = [
-    { icon: <Plus size={18} />, label: "New Echo", action: () => {} },
+    { icon: <Plus size={18} />, label: "New Echo", action: () => { } },
     { icon: <Users size={18} />, label: "Friends", action: () => navigate("/friends") },
-    { icon: <MessageSquare size={18} />, label: "Messages", action: () => {} },
-    { icon: <Bell size={18} />, label: "Notifications", action: () => {} },
+    { icon: <MessageSquare size={18} />, label: "Messages", action: () => { } },
+    { icon: <Bell size={18} />, label: "Notifications", action: () => { } },
   ];
 
   const navigationTabs = [
@@ -33,20 +32,20 @@ const HomePage = () => {
       <div className="fixed inset-0 -z-10">
         {/* Primary gradient background */}
         <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-950 to-black" />
-        
+
         {/* Subtle pattern overlay for texture */}
-        <div 
+        <div
           className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
             backgroundSize: '30px 30px'
           }}
         />
-        
+
         {/* Gradient accents (mobile-optimized) */}
         <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-rose-900/10 via-transparent to-transparent" />
         <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-purple-900/10 via-transparent to-transparent" />
-        
+
         {/* Subtle radial gradients for depth */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-rose-500/5 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
@@ -62,7 +61,7 @@ const HomePage = () => {
           <aside className="hidden lg:block lg:col-span-1 space-y-6">
             {/* Profile Card */}
             <div className="rounded-2xl border border-gray-800/50 bg-gray-900/30 backdrop-blur-sm p-6">
-              <div 
+              <div
                 className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
                 onClick={() => navigate(`/profile/${_id}`)}
               >
@@ -122,7 +121,7 @@ const HomePage = () => {
             {/* Mobile Profile Header */}
             <div className="lg:hidden rounded-2xl border border-gray-800/50 bg-gray-900/30 backdrop-blur-sm p-4 mb-4">
               <div className="flex items-center justify-between">
-                <div 
+                <div
                   className="flex items-center gap-3 cursor-pointer"
                   onClick={() => navigate(`/profile/${_id}`)}
                 >
@@ -158,11 +157,10 @@ const HomePage = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-3 sm:px-4 py-3 rounded-xl flex-1 justify-center transition-all ${
-                    activeTab === tab.id
+                  className={`flex items-center gap-2 px-3 sm:px-4 py-3 rounded-xl flex-1 justify-center transition-all ${activeTab === tab.id
                       ? "bg-gradient-to-r from-rose-500/20 to-red-500/20 text-white border border-rose-500/30"
                       : "text-gray-400 hover:text-white hover:bg-gray-800/40"
-                  }`}
+                    }`}
                 >
                   {tab.icon}
                   <span className="text-sm font-medium">{tab.label}</span>
@@ -200,30 +198,6 @@ const HomePage = () => {
               </div>
               <FriendListWidget userId={_id} />
             </div>
-
-            {/* Advertisements */}
-            <div className="rounded-2xl border border-gray-800/50 bg-gray-900/30 backdrop-blur-sm p-6">
-              <AdvertWidget />
-            </div>
-
-            {/* Online Friends */}
-            <div className="rounded-2xl border border-gray-800/50 bg-gray-900/30 backdrop-blur-sm p-6">
-              <h4 className="font-medium text-white mb-4">Online Now</h4>
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className="relative">
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-rose-500 to-red-600"></div>
-                      <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-green-500 border-2 border-gray-900"></div>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-white">Friend {i}</p>
-                      <p className="text-xs text-gray-400">Active now</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </aside>
         </div>
       </div>
@@ -235,9 +209,8 @@ const HomePage = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center p-2 min-w-[60px] ${
-                activeTab === tab.id ? "text-rose-400" : "text-gray-400"
-              }`}
+              className={`flex flex-col items-center p-2 min-w-[60px] ${activeTab === tab.id ? "text-rose-400" : "text-gray-400"
+                }`}
             >
               {tab.icon}
               <span className="text-xs mt-1">{tab.label}</span>
@@ -259,122 +232,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
-// import { useSelector } from "react-redux";
-// import Navbar from "../../scenes/navbar/index";
-// import UserWidget from "../../scenes/widgets/UserWidget";
-// import MyPostWidget from "../../scenes/widgets/MyPostWidget";
-// import PostsWidget from "../../scenes/widgets/PostsWidget";
-// import AdvertWidget from "../../scenes/widgets/AdvertWidget";
-// import FriendListWidget from "../../scenes/widgets/FriendListWidget";
-
-// const HomePage = () => {
-//   const { _id, picturePath } = useSelector((state) => state.user);
-
-//   return (
-//     <div className="min-h-screen bg-black text-neutral-100">
-//       <Navbar />
-
-//       {/* Mobile-first main feed */}
-//       <main className="mx-auto w-full max-w-6xl px-3 pb-20 pt-3 sm:px-4 lg:px-6">
-//         {/* Mobile heading */}
-//         <header className="mb-3 flex items-center justify-between border-b border-red-900/60 pb-2">
-//           <h1 className="text-base font-semibold text-neutral-50">
-//             Home
-//           </h1>
-//           <p className="text-[11px] text-neutral-500">
-//             Echoes from your circle
-//           </p>
-//         </header>
-
-//         {/* Feed first on mobile */}
-//         <section className="space-y-3 sm:space-y-4 lg:space-y-5">
-//           {/* Composer always on top */}
-//           <div className="rounded-2xl border border-red-900/70 bg-neutral-950/90 p-3 sm:p-4 shadow-[0_0_24px_rgba(127,29,29,0.45)]">
-//             <MyPostWidget picturePath={picturePath} />
-//           </div>
-
-//           {/* Posts feed - single column on mobile */}
-//           <div className="space-y-3 sm:space-y-4">
-//             <PostsWidget userId={_id} />
-//           </div>
-//         </section>
-
-//         {/* Supporting content under feed on mobile, in columns on desktop */}
-//         <section className="mt-5 grid grid-cols-1 gap-4 lg:mt-8 lg:grid-cols-[1.1fr,1.1fr]">
-//           {/* Profile + friends */}
-//           <div className="space-y-3 lg:space-y-4">
-//             <div className="rounded-2xl border border-red-900/70 bg-neutral-950/85 p-3 sm:p-4">
-//               <UserWidget userId={_id} picturePath={picturePath} />
-//             </div>
-//             <div className="rounded-2xl border border-red-900/70 bg-neutral-950/85 p-3 sm:p-4">
-//               <FriendListWidget userId={_id} />
-//             </div>
-//           </div>
-
-//           {/* Ads / extra */}
-//           <div className="space-y-3 lg:space-y-4">
-//             <div className="rounded-2xl border border-red-900/70 bg-neutral-950/85 p-3 sm:p-4">
-//               <AdvertWidget />
-//             </div>
-//           </div>
-//         </section>
-//       </main>
-
-//       {/* (Optional) bottom space reserved if you later add a bottom nav */}
-//       <div className="h-0 lg:h-0" />
-//     </div>
-//   );
-// };
-
-// export default HomePage;
-
-
-
-// // import { Box, useMediaQuery } from "@mui/material";
-// // import { useSelector } from "react-redux";
-// // import Navbar from "../../scenes/navbar/index";
-// // import UserWidget from "../../scenes/widgets/UserWidget";
-// // import MyPostWidget from "../../scenes/widgets/MyPostWidget";
-// // import PostsWidget from "../../scenes/widgets/PostsWidget";
-// // import AdvertWidget from "../../scenes/widgets/AdvertWidget";
-// // import FriendListWidget from "../../scenes/widgets/FriendListWidget";
-
-// // const HomePage = () => {
-// //   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
-// //   const { _id, picturePath } = useSelector((state) => state.user);
-
-// //   return (
-// //     <Box>
-// //       <Navbar />
-// //       <Box
-// //         width="100%"
-// //         padding="2rem 6%"
-// //         display={isNonMobileScreens ? "flex" : "block"}
-// //         gap="0.5rem"
-// //         justifyContent="space-between"
-// //       >
-// //         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
-// //           <UserWidget userId={_id} picturePath={picturePath} />
-// //         </Box>
-// //         <Box
-// //           flexBasis={isNonMobileScreens ? "42%" : undefined}
-// //           mt={isNonMobileScreens ? undefined : "2rem"}
-// //         >
-// //           <MyPostWidget picturePath={picturePath} />
-// //           <PostsWidget userId={_id} />
-// //         </Box>
-// //         {isNonMobileScreens && (
-// //           <Box flexBasis="26%">
-// //             <AdvertWidget />
-// //             <Box m="2rem 0" />
-// //             <FriendListWidget userId={_id} />
-// //           </Box>
-// //         )}
-// //       </Box>
-// //     </Box>
-// //   );
-// // };
-
-
-// // export default HomePage;

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "../../state/index";
 import PostWidget from "./PostWidget";
+import { API_URL } from "../../api";
 import { Filter, RefreshCw, Sparkles, Loader2, TrendingUp, Users, Globe, Clock, Lock } from "lucide-react";
 
 const PostsWidget = ({ userId, isProfile = false }) => {
@@ -11,77 +12,6 @@ const PostsWidget = ({ userId, isProfile = false }) => {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("recent");
   const [refreshing, setRefreshing] = useState(false);
-
-  const mockPosts = [
-    {
-      _id: "1",
-      userId: "mockUser1",
-      firstName: "Alex",
-      lastName: "Morgan",
-      description: "Just launched my new portfolio website! 🚀 After months of hard work, I'm excited to share it with everyone. Built with React and Tailwind CSS.",
-      location: "San Francisco",
-      picturePath: "",
-      userPicturePath: "",
-      audience: "public",
-      likes: { "mockUser2": true, "mockUser3": true },
-      comments: [
-        { userId: "mockUser2", text: "This looks amazing! Great work Alex!" },
-        { userId: "mockUser3", text: "Love the minimalist design 👏" }
-      ],
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      tags: ["design", "webdev", "portfolio"]
-    },
-    {
-      _id: "2",
-      userId: "mockUser2",
-      firstName: "Taylor",
-      lastName: "Swift",
-      description: "Beautiful sunset at the beach today. Sometimes you just need to disconnect and enjoy nature's beauty. 🌅 What's your favorite place to unwind?",
-      location: "Miami",
-      picturePath: "sunset.jpg",
-      userPicturePath: "",
-      audience: "friends",
-      likes: { "mockUser1": true, "mockUser4": true, "mockUser5": true },
-      comments: [
-        { userId: "mockUser4", text: "Stunning view! 😍" }
-      ],
-      createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-      tags: ["nature", "photography", "travel"]
-    },
-    {
-      _id: "3",
-      userId: "mockUser3",
-      firstName: "Jordan",
-      lastName: "Lee",
-      description: "Just completed the marathon! 🏃‍♂️ 42.2km in 3:45:22. The training was tough but totally worth it. Never stop pushing your limits!",
-      location: "Chicago",
-      picturePath: "",
-      userPicturePath: "",
-      audience: "public",
-      likes: { "mockUser1": true, "mockUser2": true, "mockUser4": true, "mockUser5": true },
-      comments: [
-        { userId: "mockUser1", text: "Incredible achievement! Congratulations!" },
-        { userId: "mockUser5", text: "You're an inspiration! 💪" }
-      ],
-      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      tags: ["fitness", "marathon", "achievement"]
-    },
-    {
-      _id: "4",
-      userId: "mockUser4",
-      firstName: "Casey",
-      lastName: "Kim",
-      description: "Just read this fascinating article about AI ethics. The future is exciting but we need to be mindful of the implications. What are your thoughts on responsible AI development?",
-      location: "Seattle",
-      picturePath: "",
-      userPicturePath: "",
-      audience: "private",
-      likes: { "mockUser3": true },
-      comments: [],
-      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      tags: ["ai", "tech", "ethics", "discussion"]
-    },
-  ];
 
   const filters = [
     { id: "recent", icon: <Clock size={16} />, label: "Most Recent" },
@@ -98,8 +28,8 @@ const PostsWidget = ({ userId, isProfile = false }) => {
     try {
       setLoading(true);
       const url = isProfile
-        ? `https://echocircle-backend.vercel.app/posts/${userId}/posts`
-        : "https://echocircle-backend.vercel.app/posts";
+        ? `${API_URL}/posts/${userId}/posts`
+        : `${API_URL}/posts`;
 
       const response = await fetch(url, {
         method: "GET",
@@ -114,12 +44,12 @@ const PostsWidget = ({ userId, isProfile = false }) => {
         console.log("Fetched posts:", data);
         dispatch(setPosts({ posts: Array.isArray(data) ? data : [] }));
       } else {
-        console.log("Using mock posts data");
-        dispatch(setPosts({ posts: mockPosts }));
+        console.error("Failed to fetch posts");
+        dispatch(setPosts({ posts: [] }));
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
-      dispatch(setPosts({ posts: mockPosts }));
+      dispatch(setPosts({ posts: [] }));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -133,9 +63,9 @@ const PostsWidget = ({ userId, isProfile = false }) => {
 
   const getFilteredPosts = () => {
     if (!Array.isArray(posts)) return [];
-    
+
     let filtered = [...posts];
-    
+
     switch (activeFilter) {
       case "recent":
         filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -156,7 +86,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
         filtered = filtered.filter(post => post.audience === "public");
         break;
     }
-    
+
     return filtered;
   };
 
@@ -191,8 +121,8 @@ const PostsWidget = ({ userId, isProfile = false }) => {
                 {isProfile ? "Profile Echoes" : "Latest Echoes"}
               </h2>
               <p className="text-sm text-gray-400">
-                {isProfile 
-                  ? "All posts from this profile" 
+                {isProfile
+                  ? "All posts from this profile"
                   : "Updates from your circles"}
               </p>
             </div>
@@ -242,11 +172,10 @@ const PostsWidget = ({ userId, isProfile = false }) => {
             <button
               key={filter.id}
               onClick={() => setActiveFilter(filter.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm transition-all ${
-                activeFilter === filter.id
-                  ? "border-rose-500 bg-rose-500/10 text-white"
-                  : "border-gray-800 text-gray-400 hover:border-gray-700 hover:text-white"
-              }`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm transition-all ${activeFilter === filter.id
+                ? "border-rose-500 bg-rose-500/10 text-white"
+                : "border-gray-800 text-gray-400 hover:border-gray-700 hover:text-white"
+                }`}
             >
               {filter.icon}
               <span>{filter.label}</span>
@@ -287,9 +216,9 @@ const PostsWidget = ({ userId, isProfile = false }) => {
                           {formatTimeAgo(post.createdAt)}
                         </span>
                         <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800/50 text-gray-300">
-                          {post.audience === "private" ? <Lock size={10} /> : 
-                           post.audience === "friends" ? <Users size={10} /> : 
-                           <Globe size={10} />}
+                          {post.audience === "private" ? <Lock size={10} /> :
+                            post.audience === "friends" ? <Users size={10} /> :
+                              <Globe size={10} />}
                         </span>
                       </div>
                     </div>
@@ -331,9 +260,9 @@ const PostsWidget = ({ userId, isProfile = false }) => {
                     </span>
                   </div>
                   <span className="text-gray-500">
-                    {post.audience === "private" ? "Private" : 
-                     post.audience === "friends" ? "Friends Only" : 
-                     "Public"}
+                    {post.audience === "private" ? "Private" :
+                      post.audience === "friends" ? "Friends Only" :
+                        "Public"}
                   </span>
                 </div>
               </div>
@@ -347,7 +276,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
           </div>
           <h3 className="text-lg font-semibold text-white mb-2">No posts found</h3>
           <p className="text-gray-400 max-w-md mx-auto">
-            {activeFilter !== "recent" 
+            {activeFilter !== "recent"
               ? `No posts match the "${filters.find(f => f.id === activeFilter)?.label}" filter`
               : isProfile
                 ? "This user hasn't shared any echoes yet"
@@ -360,106 +289,3 @@ const PostsWidget = ({ userId, isProfile = false }) => {
 };
 
 export default PostsWidget;
-
-
-
-// import { useEffect } from "react";
-// import { Typography } from "@mui/material";
-// import { useDispatch, useSelector } from "react-redux";
-// import { setPosts } from "../../state/index";
-// import PostWidget from "./PostWidget";
-
-// const PostsWidget = ({ userId, isProfile = false }) => {
-//   const dispatch = useDispatch();
-//   const posts = useSelector((state) => state.posts);
-//   const token = useSelector((state) => state.token);
-
-//   // Mock posts data
-//   const mockPosts = [
-//     {
-//       _id: "1",
-//       userId: "mockUser1",
-//       firstName: "John",
-//       lastName: "Doe",
-//       description: "This is a sample post to test the feed!",
-//       location: "New York",
-//       picturePath: "",
-//       userPicturePath: "",
-//       likes: {},
-//       comments: ["Great post!", "Thanks for sharing"],
-//       createdAt: new Date().toISOString(),
-//     },
-//     {
-//       _id: "2",
-//       userId: "mockUser2",
-//       firstName: "Jane",
-//       lastName: "Smith",
-//       description: "Another test post with some content.",
-//       location: "Los Angeles",
-//       picturePath: "",
-//       userPicturePath: "",
-//       likes: {},
-//       comments: [],
-//       createdAt: new Date().toISOString(),
-//     },
-//   ];
-
-//   useEffect(() => {
-//     const fetchPosts = async () => {
-//       try {
-//         const url = isProfile 
-//           ? `https://echocircle-backend.vercel.app/posts/${userId}/posts`
-//           : "https://echocircle-backend.vercel.app/posts";
-
-//         const response = await fetch(url, {
-//           method: "GET",
-//           headers: { 
-//             Authorization: `Bearer ${token}`,
-//             "Content-Type": "application/json"
-//           },
-//         });
-
-//         if (response.ok) {
-//           const data = await response.json();
-//           console.log("Fetched posts:", data);
-//           dispatch(setPosts({ posts: Array.isArray(data) ? data : [] }));
-//         } else {
-//           // Use mock data if API fails
-//           console.log("Using mock posts data");
-//           dispatch(setPosts({ posts: mockPosts }));
-//         }
-//       } catch (error) {
-//         console.error("Error fetching posts:", error);
-//         // Use mock data on error
-//         dispatch(setPosts({ posts: mockPosts }));
-//       }
-//     };
-
-//     fetchPosts();
-//   }, [dispatch, isProfile, userId, token]);
-
-//   return (
-//     <>
-//       {Array.isArray(posts) && posts.length > 0 ? (
-//         posts.map((post) => (
-//           <PostWidget
-//             key={post._id}
-//             postId={post._id}
-//             postUserId={post.userId}
-//             name={`${post.firstName} ${post.lastName}`}
-//             description={post.description}
-//             location={post.location}
-//             picturePath={post.picturePath}
-//             userPicturePath={post.userPicturePath}
-//             likes={post.likes || {}}
-//             comments={post.comments || []}
-//           />
-//         ))
-//       ) : (
-//         <Typography>No posts available</Typography>
-//       )}
-//     </>
-//   );
-// };
-
-// export default PostsWidget;
