@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "../../state/index";
 import PostWidget from "./PostWidget";
