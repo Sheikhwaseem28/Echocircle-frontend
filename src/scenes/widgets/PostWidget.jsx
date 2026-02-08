@@ -1,21 +1,17 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Friend from "../../components/Friend";
+
 import { setPost } from "../../state/index";
 import { API_URL } from "../../api";
 import {
   Heart,
   MessageCircle,
-  Share2,
-  Bookmark,
-  MoreVertical,
   Send,
   Smile,
   Globe,
   Users,
   Lock,
   Image as ImageIcon,
-  ExternalLink,
 } from "lucide-react";
 
 const PostWidget = ({

@@ -20,11 +20,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
     { id: "public", icon: <Globe size={16} />, label: "Public Posts" },
   ];
 
-  useEffect(() => {
-    fetchPosts();
-  }, [dispatch, isProfile, userId, token]);
-
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
       const url = isProfile
@@ -54,7 +50,11 @@ const PostsWidget = ({ userId, isProfile = false }) => {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [isProfile, userId, token, dispatch]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -84,6 +84,8 @@ const PostsWidget = ({ userId, isProfile = false }) => {
         break;
       case "public":
         filtered = filtered.filter(post => post.audience === "public");
+        break;
+      default:
         break;
     }
 

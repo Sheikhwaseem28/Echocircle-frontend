@@ -8,16 +8,12 @@ import {
   MapPin,
   Briefcase,
   Eye,
-  BarChart3,
-  Users,
   Calendar,
-  Mail,
   Globe,
   Settings,
   Award,
   Sparkles,
   Loader2,
-  Edit,
 } from "lucide-react";
 
 const UserWidget = ({ userId, picturePath }) => {
@@ -87,7 +83,7 @@ const UserWidget = ({ userId, picturePath }) => {
     viewedProfile,
     impressions,
     friends,
-    email,
+
     createdAt,
   } = user;
 
